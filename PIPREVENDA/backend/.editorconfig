@@ -1,0 +1,109 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+[*.{json,xml,csproj,props,targets,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# DT-005: Padrões de Estilo de Código e Qualidade - Backend
+# ---------------------------------------------------------------------------
+
+[*.cs]
+# Allman style (chave em nova linha)
+csharp_new_line_before_open_brace = all
+
+# Namespace file-scoped
+csharp_style_namespace_declarations = file_scoped:error
+
+# Using fora do namespace
+csharp_using_directive_placement = outside_namespace:error
+
+# Tipos primitivos com keyword (string, int) em vez de tipo .NET (String, Int32)
+dotnet_style_predefined_type_for_locals_parameters_members = true:error
+dotnet_style_predefined_type_for_member_access = true:error
+
+# var apenas quando o tipo é óbvio
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# String interpolation em vez de concatenação
+dotnet_style_prefer_compound_assignment = true:suggestion
+
+# Collection expressions
+csharp_style_prefer_collection_expression = true:suggestion
+
+# Uma instrução por linha
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+
+# ---------------------------------------------------------------------------
+# Convenções de nomenclatura
+# ---------------------------------------------------------------------------
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+dotnet_naming_style.interface_prefix.capitalization = pascal_case
+dotnet_naming_style.interface_prefix.required_prefix = I
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+dotnet_naming_style.s_camel_case.capitalization = camel_case
+dotnet_naming_style.s_camel_case.required_prefix = s_
+
+dotnet_naming_style.t_camel_case.capitalization = camel_case
+dotnet_naming_style.t_camel_case.required_prefix = t_
+
+# Interfaces: IPascalCase
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+dotnet_naming_rule.interfaces_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_start_with_i.style = interface_prefix
+dotnet_naming_rule.interfaces_start_with_i.severity = error
+
+# Tipos (classes, structs, enums, records), métodos, propriedades: PascalCase
+dotnet_naming_symbols.types_and_members.applicable_kinds = class, struct, enum, record, method, property, event
+dotnet_naming_symbols.types_and_members.applicable_accessibilities = *
+dotnet_naming_rule.types_and_members_pascal_case.symbols = types_and_members
+dotnet_naming_rule.types_and_members_pascal_case.style = pascal_case
+dotnet_naming_rule.types_and_members_pascal_case.severity = error
+
+# Constantes: PascalCase
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.required_modifiers = const
+dotnet_naming_rule.constants_pascal_case.symbols = constants
+dotnet_naming_rule.constants_pascal_case.style = pascal_case
+dotnet_naming_rule.constants_pascal_case.severity = error
+
+# Campos privados: _camelCase
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
+dotnet_naming_rule.private_fields_underscore.severity = error
+
+# Campos static private: s_camelCase
+dotnet_naming_symbols.static_private_fields.applicable_kinds = field
+dotnet_naming_symbols.static_private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.static_private_fields.required_modifiers = static
+dotnet_naming_rule.static_private_fields_prefix.symbols = static_private_fields
+dotnet_naming_rule.static_private_fields_prefix.style = s_camel_case
+dotnet_naming_rule.static_private_fields_prefix.severity = error
+
+# Parâmetros e variáveis locais: camelCase
+dotnet_naming_symbols.locals_and_parameters.applicable_kinds = local, parameter
+dotnet_naming_rule.locals_and_parameters_camel_case.symbols = locals_and_parameters
+dotnet_naming_rule.locals_and_parameters_camel_case.style = camel_case
+dotnet_naming_rule.locals_and_parameters_camel_case.severity = suggestion

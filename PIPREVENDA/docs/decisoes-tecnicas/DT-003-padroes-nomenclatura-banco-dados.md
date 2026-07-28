@@ -1,829 +1,763 @@
-# DT-003: Padrões de Nomenclatura de Objetos de Banco de Dados PostgreSQL
-
-> **Metadados do Documento**  
-> **Componente:** `Banco de Dados`  
+# DT-003: Padrões de Nomenclatura de Objetos de Banco de Dados SQL Server
+ 
+> **Metadados do Documento**
+> **Componente:** `Banco de Dados`
 > **Tipo:** Decisão Técnica
 >
-> **Propósito:** Garantir consistência, manutenibilidade e aderência aos padrões corporativos Petrobras (PE-2TIC-00319) em nomenclaturas de objetos de BD
+> **Propósito:** Garantir consistência e manutenibilidade nas nomenclaturas de objetos de BD do projeto **Sistema de Gestão de Contratos — ALE Combustíveis** (PIPREVENDA-1680)
 >
-> **Quando usar:** Ao criar ou modificar objetos de banco de dados PostgreSQL (tabelas, colunas, índices, constraints, schemas, functions)
+> **Quando usar:** Ao criar ou modificar objetos de banco de dados SQL Server (tabelas, colunas, índices, constraints, schemas, views, functions, procedures, triggers)
 >
-> **Palavras-chave:** `postgresql` `nomenclatura` `padrões` `pe-2tic-00319` `convenções` `banco-de-dados`
-
+> **Palavras-chave:** `sql-server` `t-sql` `nomenclatura` `padrões` `convenções` `banco-de-dados` `ale`
+ 
 ## Contexto
-
-O projeto **+Digital (a11732)** utiliza PostgreSQL como banco de dados principal. Para garantir **consistência**, **manutenibilidade** e **aderência aos padrões corporativos Petrobras** (baseados na norma PE-2TIC-00319), é necessário estabelecer convenções claras de nomenclatura para todos os objetos de banco de dados.
-
+ 
+O projeto **Sistema de Gestão de Contratos (ALE Combustíveis)** utiliza **SQL Server** como banco de dados principal. Em ambiente de desenvolvimento local, a instância é acessada em `localhost`, database **`mk_gestaoContrato`**.
+ 
+O backend é construído em **.NET 10** com Clean Architecture (solução de referência `PortalAle`), persistência via **EF Core** na camada `Data.SqlServer`, com um contexto de staging isolado (`Data.SapStaging`) para a ingestão vinda do SAP via ADF. As entidades de domínio (`Contrato`, `Aditivo`, `Guarda-chuva`, `Grupo Econômico`, `Reappraise`) são modeladas em C#, em PascalCase.
+ 
+Este documento estabelece um padrão de nomenclatura **próprio deste projeto**, definido para SQL Server e para este cliente (ALE). Ele não deriva de nem se baseia em normas de outro cliente ou projeto — é uma convenção nova, pensada para as características do SQL Server e para a integração natural com .NET/EF Core.
+ 
 ### Problema
-
-- **Inconsistências** em nomenclaturas entre diferentes módulos do sistema
-- **Dificuldade de manutenção** devido à falta de padrões claros
-- **Necessidade de aderência** aos padrões corporativos da Petrobras
-- **Adaptação** dos padrões Oracle (PE-2TIC-00319) para **PostgreSQL**
-- **Rastreabilidade** de objetos e seus propósitos através de nomenclatura padronizada
-
+ 
+- **Inconsistências** de nomenclatura entre módulos (E1–E6) e integrações (SAP, PCR, Elaw, Data Lake)
+- **Dificuldade de manutenção** sem um padrão único, especialmente com múltiplos desenvolvedores e integrações externas (SAP, PCR, Elaw) que trazem seus próprios formatos de campo, exigindo um "De-Para" claro
+- **Necessidade de alinhamento com o ecossistema .NET/EF Core**, já que o domínio é modelado em C# (PascalCase) e persistido via EF Core
+- **Rastreabilidade** de objetos e de seus propósitos através de nomenclatura padronizada, dado o volume do projeto (+20 mil contratos)
 ### Necessidades de Negócio
-
-1. Garantir **qualidade e governança** de dados
-2. Facilitar **onboarding** de novos desenvolvedores
-3. Manter **compatibilidade** com ferramentas de análise e auditoria
-4. Assegurar **rastreabilidade** e **documentação automatizada**
-
+ 
+1. Garantir **qualidade e governança** de dados desde o início do projeto (nenhuma linha de código de produto foi escrita ainda — este é o momento certo para fixar o padrão)
+2. Facilitar **onboarding** de novos desenvolvedores no time
+3. Manter **compatibilidade** e previsibilidade para as integrações (SAP, PCR, Elaw, Data Lake) e para ferramentas de auditoria/observabilidade já previstas na arquitetura
+4. Assegurar **rastreabilidade** e **documentação automatizada** via extended properties
 ---
-
+ 
 ## Decisão
-
-Adotaremos padrões de nomenclatura de objetos de banco de dados PostgreSQL **baseados na norma PE-2TIC-00319 da Petrobras**, adaptados às características específicas do PostgreSQL, seguindo princípios de **normalização** e **boas práticas de modelagem**.
-
+ 
+Adotaremos um padrão de nomenclatura de objetos SQL Server desenhado especificamente para o projeto ALE, seguindo princípios de normalização, boas práticas de modelagem e as convenções idiomáticas do SQL Server/.NET.
+ 
 ### Princípios Fundamentais
-
-1. **Nomes em minúsculas** para todos os objetos de banco de dados (tabelas, colunas, índices, etc.)
-2. **Palavras reservadas SQL em MAIÚSCULAS** (SELECT, INSERT, CREATE, etc.)
-3. **Singular e masculino** para nomes de tabelas e colunas
+ 
+1. **PascalCase** para todos os objetos de banco de dados (tabelas, colunas, views, procedures, functions, triggers)
+2. **Palavras reservadas T-SQL em MAIÚSCULAS** (SELECT, INSERT, CREATE, etc.) — apenas as palavras reservadas da linguagem, não os identificadores
+3. **Singular** para nomes de tabelas e colunas
 4. **Nomenclatura descritiva** e auto-explicativa
-5. **Mnemônicos de até 4 caracteres** para colunas
-6. **Códigos de classe padronizados** para colunas
-7. **Comentários obrigatórios** em todos os objetos
-8. **Uso de underscore (\_)** para separação de termos
-
-### Importante: Por que minúsculas no PostgreSQL?
-
-Apesar da norma PE-2TIC-00319 da Petrobras recomendar MAIÚSCULAS (baseada em Oracle), **o PostgreSQL tem comportamento diferente**:
-
-- **Identificadores sem aspas** são automaticamente convertidos para **minúsculas**
-- Mesmo que você escreva `CREATE TABLE FUNCIONARIO`, o PostgreSQL cria como `funcionario`
-- Para forçar maiúsculas, seria necessário usar aspas duplas: `CREATE TABLE "FUNCIONARIO"` (não recomendado)
-- Usar aspas duplas causa problemas: obriga usar aspas em **todas** as referências futuras
-
+5. **Código de classe** (2 letras) como prefixo do nome da coluna, indicando o propósito/tipo do dado — **sem** o mnemônico da tabela (decisão específica deste projeto, ver seção 4 abaixo)
+6. **Extended properties obrigatórias** (`sp_addextendedproperty`) em todos os objetos, como forma de documentação automatizada
+7. **Sem underscore** para separar termos dentro de um mesmo identificador — a separação é feita pela própria capitalização (PascalCase)
+### Por que PascalCase no SQL Server?
+ 
+O SQL Server se comporta de forma diferente do PostgreSQL nesse aspecto:
+ 
+- A instância roda, por padrão, com uma **collation case-insensitive** (ex.: `SQL_Latin1_General_CP1_CI_AS`), então `Contrato`, `contrato` e `CONTRATO` são tratados como o **mesmo objeto** em comparações — mas o SQL Server **preserva a caixa exatamente como foi digitada na criação** para fins de exibição (em `sys.tables`, no SSMS, etc.)
+- Diferente do PostgreSQL, **não é necessário usar colchetes** (`[Contrato]`, equivalente às aspas duplas do Postgres) para preservar a caixa — o comportamento padrão já preserva
+- PascalCase é a convenção idiomática de T-SQL/SSMS (scripts auto-gerados, IntelliSense) e, mais importante, é a convenção padrão do **Entity Framework Core**, que mapeia classes e propriedades C# (PascalCase) diretamente para tabelas e colunas
+- Como usamos códigos de classe nas colunas (ver seção 4), o mapeamento não será 1:1 automático com as propriedades das entidades de domínio — será necessário configurar explicitamente via Fluent API (`HasColumnName`) ou `IEntityTypeConfiguration<T>`. Isso é uma escolha consciente (ver "Consequências")
 ---
-
+ 
 ## Padrões de Nomenclatura
-
+ 
 ### 1. Regras Gerais
-
+ 
 Todos os nomes devem:
-
+ 
 - Começar com uma **letra**
-- Conter apenas **letras (A-Z)**, **números (0-9)** e **underscore (\_)**
-- Não usar acentos, caracteres especiais ou espaços
-- Respeitar limite de **63 caracteres** do PostgreSQL (recomendado máximo de 30 para compatibilidade)
-
+- Conter apenas **letras (A-Z, a-z)** e **números (0-9)** — sem underscore, acentos, caracteres especiais ou espaços
+- Respeitar o limite de **128 caracteres** do SQL Server (recomendado máximo de 30-40 para legibilidade)
+- **Evitar palavras reservadas** do T-SQL como nome de objeto (`User`, `Order`, `Group`, `Identity`, `Key`, `Table`) — em especial, **nunca usar `Timestamp`** como nome de coluna: no SQL Server esse é um tipo especial (sinônimo de `rowversion`), não uma data/hora
 ```sql
 -- ✅ Válidos
-CREATE TABLE funcionario (...);
-CREATE INDEX in_func_cpf ON funcionario (func_nr_cpf);
-
+CREATE TABLE Contrato (...);
+CREATE INDEX IX_Contrato_NrCnpj ON Contrato (NrCnpj);
+ 
 -- ❌ Inválidos
-CREATE TABLE 1funcionario (...);      -- Começa com número
-CREATE TABLE funcionário (...);       -- Contém acento
-CREATE TABLE "Funcionário" (...);     -- Case-sensitive com aspas (evitar)
-CREATE TABLE FUNCIONARIO (...);       -- Será convertido para minúsculo pelo PostgreSQL
+CREATE TABLE 1Contrato (...);        -- Começa com número
+CREATE TABLE Contrato_Item (...);    -- Underscore não é usado neste padrão
+CREATE TABLE [Contrato] (...);       -- Colchetes desnecessários (nome já é válido sem eles)
+CREATE TABLE [Group] (...);          -- Nome reservado (evitar mesmo entre colchetes)
 ```
-
+ 
 ---
-
+ 
 ### 2. Nomenclatura de Schemas
-
-**Padrão:** `<codigo_aplicacao>` ou `<area_negocio>`
-
+ 
+**Padrão:** `dbo` (schema padrão, recomendado para o domínio principal) ou um schema dedicado por contexto.
+ 
+Dado que a arquitetura já separa `Data.SqlServer` (domínio) de `Data.SapStaging` (staging da ingestão SAP), o mesmo isolamento é refletido em schemas:
+ 
 ```sql
--- Exemplos
-CREATE SCHEMA a11732;           -- Schema principal da aplicação
-CREATE SCHEMA a11732_audit;     -- Schema de auditoria
-CREATE SCHEMA a11732_staging;   -- Schema de staging/temporário
+-- Schema padrão do domínio (recomendado, sem necessidade de criação explícita)
+-- dbo.Contrato, dbo.Aditivo, dbo.GrupoEconomico
+ 
+-- Schemas dedicados por contexto, quando necessário
+CREATE SCHEMA Stg AUTHORIZATION dbo;  -- staging da integração SAP (ADF)
+CREATE SCHEMA Aud AUTHORIZATION dbo;  -- tabelas/objetos de auditoria
 ```
-
+ 
 ---
-
+ 
 ### 3. Nomenclatura de Tabelas
-
-**Padrão:** `<nome_entidade>` (singular, masculino, sem prefixos)
-
+ 
+**Padrão:** `<NomeEntidade>` (singular, PascalCase, sem prefixos)
+ 
 **Regras:**
-
-- Nome no **singular** e **masculino**
-- Letras **minúsculas** (sem aspas duplas)
+ 
+- Nome no **singular**
+- **PascalCase**, sem colchetes
 - Máximo **30 caracteres** (recomendado)
-- Termos separados por **underscore (\_) **
-- **Mínimo 2 letras** por termo
-- Evitar **preposições** e **artigos**
-
+- Sem underscore — capitalização separa os termos
+- Evitar preposições e artigos
 ```sql
 -- ✅ Exemplos corretos
-CREATE TABLE funcionario (...);
-CREATE TABLE saldo_fgts (...);
-CREATE TABLE folha_ferias (...);
-CREATE TABLE produto (...);
-CREATE TABLE pedido_item (...);
-
+CREATE TABLE Contrato (...);
+CREATE TABLE Aditivo (...);
+CREATE TABLE GrupoEconomico (...);
+CREATE TABLE Reappraise (...);
+CREATE TABLE ContratoItem (...);
+ 
 -- ❌ Exemplos incorretos
-CREATE TABLE funcionarios (...);     -- Plural
-CREATE TABLE func_do_rh (...);       -- Preposição "do"
-CREATE TABLE tbl_funcionario (...);  -- Prefixo desnecessário
-CREATE TABLE "FUNCIONARIO" (...);    -- Aspas duplas (case-sensitive forçado)
+CREATE TABLE Contratos (...);        -- Plural
+CREATE TABLE ContratoDoRevendedor (...); -- Preposição "Do"
+CREATE TABLE tbl_Contrato (...);     -- Prefixo desnecessário
+CREATE TABLE contrato (...);         -- Não segue PascalCase
 ```
-
-**Comentários obrigatórios:**
-
+ 
+**Documentação obrigatória (extended property):**
+ 
 ```sql
-COMMENT ON TABLE funcionario IS 'Cadastro de funcionários da empresa';
+EXEC sp_addextendedproperty
+    @name = N'MS_Description',
+    @value = N'Cadastro consolidado de contratos (Rede/GRR/B2B)',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE',  @level1name = 'Contrato';
 ```
-
+ 
 ---
-
+ 
 ### 4. Nomenclatura de Colunas
-
-**Padrão:** `<mnemônico>_<código_classe>_<descrição>`
-
+ 
+**Padrão:** `<CódigoClasse><Descrição>` — **sem** o mnemônico da tabela como prefixo.
+ 
+> **Decisão específica deste projeto:** diferente de padrões que prefixam a coluna com uma abreviação da tabela (ex.: `FuncCdFuncionario`), aqui a coluna carrega apenas o **código de classe** + a **descrição**. O nome da tabela já fica explícito no contexto de qualquer JOIN/consulta (via alias) e nas entidades EF Core, tornando o prefixo redundante.
+ 
 **Regras:**
-
-- Nome no **singular** e **masculino**
-- Letras **minúsculas** (sem aspas duplas)
+ 
+- **PascalCase**, sem underscore
 - Máximo **30 caracteres** (recomendado)
-- Termos separados por **underscore (\_) **
-- Evitar **preposições** e **artigos**
-- Utilizar mnemônico da tabela de referência como prefixo da coluna
-- Utilizar códigos de classe após mnemônico da tabela para definir propósito do campo
-
-#### 4.1 Mnemônico de Tabela (4 caracteres)
-
-| Palavras | Regra                       | Exemplo                          |
-| -------- | --------------------------- | -------------------------------- |
-| 1        | Primeiros 4 caracteres      | EMPREGADO → EMPR                 |
-| 2        | 2 + 2 caracteres            | DM_EMPREGADO → DMEM              |
-| 3        | 2 + 1 + 1 caracteres        | CT_CONTROLE_RELATORIO → CTCR     |
-| 4+       | 2 + palavras significativas | MM_BASE_CONSULTA_ATRIBUTO → MMBA |
-
-**Mnemônicos Comuns:**
-
-```sql
-func = funcionario
-dept = departamento
-prod = produto
-pedo = pedido
-item = item_pedido
-clie = cliente
-forn = fornecedor
-esto = estoque
-```
-
-#### 4.2 Códigos de Classe
-
-| Código | Descrição            | Tipo PostgreSQL                            | Exemplo                                                        |
-| ------ | -------------------- | ------------------------------------------ | -------------------------------------------------------------- |
-| **CD** | Código/Identificador | `INTEGER`, `BIGINT`                        | `func_cd_funcionario INTEGER`                                  |
-| **DS** | Descrição            | `VARCHAR(n)`, `TEXT`                       | `prod_ds_produto VARCHAR(200)`                                 |
-| **VL** | Valor monetário      | `NUMERIC(p,s)`, `MONEY`                    | `cont_vl_total NUMERIC(15,2)`                                  |
-| **IN** | Indicador            | `CHAR(1)`, `BOOLEAN`                       | `func_in_ativo CHAR(1)` ou `BOOLEAN`                           |
-| **DT** | Data                 | `DATE`                                     | `func_dt_admissao DATE`                                        |
-| **NM** | Nome                 | `VARCHAR(n)`                               | `func_nm_completo VARCHAR(100)`                                |
-| **NR** | Número               | `INTEGER`, `BIGINT`                        | `func_nr_matricula INTEGER`                                    |
-| **MD** | Medida               | `NUMERIC(p,s)`                             | `equip_md_peso NUMERIC(10,3)`                                  |
-| **QN** | Quantidade           | `INTEGER`, `NUMERIC`                       | `esto_qn_estoque INTEGER`                                      |
-| **SG** | Sigla                | `CHAR(n)`, `VARCHAR(n)`                    | `esta_sg_uf CHAR(2)`                                           |
-| **PR** | Percentual           | `NUMERIC(5,2)`                             | `func_pr_comissao NUMERIC(5,2)`                                |
-| **CD** | Código (auto-incr)   | `INTEGER GENERATED BY DEFAULT AS IDENTITY` | `func_cd_funcionario INTEGER GENERATED BY DEFAULT AS IDENTITY` |
-| **TX** | Texto livre          | `TEXT`, `VARCHAR(n)`                       | `equip_tx_observacao TEXT`                                     |
-| **MM** | Multimídia           | `BYTEA`                                    | `func_mm_foto BYTEA`                                           |
-| **DF** | Data com fuso        | `TIMESTAMP WITH TIME ZONE`                 | `prod_df_criacao TIMESTAMP WITH TIME ZONE`                     |
-| **JS** | JSON                 | `JSON`, `JSONB`                            | `prod_js_metadados JSONB`                                      |
-
-**Evitar Redundância:**
-
+- Evitar preposições e artigos
+- Evitar redundância entre o código de classe e a descrição
+#### 4.1 Códigos de Classe
+ 
+| Código | Descrição            | Tipo SQL Server recomendado          | Exemplo                              |
+| ------ | -------------------- | ------------------------------------- | ------------------------------------- |
+| **Id** | Identificador (PK/FK, auto-incremento) | `INT IDENTITY(1,1)` / `BIGINT IDENTITY(1,1)` | `Id`, `IdGrupoEconomico`      |
+| **Cd** | Código (não auto-incremento, ex.: código externo/de negócio) | `INT`, `VARCHAR(n)`     | `CdSap`, `CdSegmento`                |
+| **Ds** | Descrição             | `NVARCHAR(n)`                         | `DsProduto`                           |
+| **Vl** | Valor monetário       | `DECIMAL(p,s)`                        | `VlTotal DECIMAL(15,2)`               |
+| **In** | Indicador (booleano)  | `BIT`                                 | `InAtivo BIT`                         |
+| **Dt** | Data                  | `DATE`                                | `DtAdmissao DATE`                     |
+| **Nm** | Nome                  | `NVARCHAR(n)`                         | `NmCompleto NVARCHAR(100)`            |
+| **Nr** | Número (identificador não sequencial) | `INT`, `VARCHAR(n)`  | `NrCnpj VARCHAR(14)`, `NrContrato`    |
+| **Md** | Medida                | `DECIMAL(p,s)`                        | `MdVolume DECIMAL(10,3)`              |
+| **Qn** | Quantidade             | `INT`, `DECIMAL(p,s)`                 | `QnDependentes INT`                   |
+| **Sg** | Sigla                  | `CHAR(n)`, `VARCHAR(n)`               | `SgUf CHAR(2)`                        |
+| **Pr** | Percentual             | `DECIMAL(5,2)`                        | `PrComissao DECIMAL(5,2)`             |
+| **Tx** | Texto livre            | `NVARCHAR(MAX)`                       | `TxObservacao NVARCHAR(MAX)`          |
+| **Mm** | Multimídia / binário   | `VARBINARY(MAX)`                      | `MmAnexo VARBINARY(MAX)`              |
+| **Dh** | Data com hora e fuso   | `DATETIMEOFFSET`                      | `DhCriacao DATETIMEOFFSET`            |
+| **Js** | JSON                   | `NVARCHAR(MAX)` (com `ISJSON` check)  | `JsMetadados NVARCHAR(MAX)`           |
+ 
+> **Atenção (armadilha específica do SQL Server):** o tipo `TIMESTAMP` **não é** uma data/hora no T-SQL — é um sinônimo legado de `ROWVERSION` (contador binário interno de concorrência). Para data/hora com fuso, use sempre `DATETIME2` ou `DATETIMEOFFSET`, nunca `TIMESTAMP`.
+ 
+**Evitar redundância:**
+ 
 ```sql
 -- ❌ Redundante
-FUNC_CD_CODIGO
-FUNC_DT_DATA_NASCIMENTO
-FUNC_NM_NOME_PAI
-
+IdIdContrato
+DtDataNascimento
+NmNomePai
+ 
 -- ✅ Correto
-func_cd_funcionario
-func_dt_nascimento
-func_nm_pai
+IdContrato
+DtNascimento
+NmPai
 ```
-
-**Comentários obrigatórios:**
-
+ 
+**Documentação obrigatória:**
+ 
 ```sql
-COMMENT ON COLUMN funcionario.func_cd_funcionario IS 'Código único do funcionário';
-COMMENT ON COLUMN funcionario.func_nm_completo IS 'Nome completo do funcionário';
-COMMENT ON COLUMN funcionario.func_in_ativo IS 'Indicador se funcionário está ativo (S/N ou TRUE/FALSE)';
+EXEC sp_addextendedproperty
+    @name = N'MS_Description', @value = N'Código único do contrato',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE',  @level1name = 'Contrato',
+    @level2type = N'COLUMN', @level2name = 'IdContrato';
 ```
-
+ 
 ---
-
+ 
 ### 5. Constraints
-
+ 
+Aqui seguimos a convenção idiomática do SQL Server/SSMS (prefixos em maiúsculas), que já referencia o nome da tabela — a omissão de prefixo é uma decisão restrita às **colunas** (seção 4), não às constraints.
+ 
 #### 5.1 Chave Primária
-
-**Padrão:** `pk_<mnemônico>`
-
+ 
+**Padrão:** `PK_<Tabela>`
+ 
 ```sql
-ALTER TABLE funcionario
-ADD CONSTRAINT pk_func
-PRIMARY KEY (func_cd_funcionario);
+ALTER TABLE Contrato
+ADD CONSTRAINT PK_Contrato PRIMARY KEY (IdContrato);
 ```
-
+ 
 #### 5.2 Chave Estrangeira
-
-**Padrão:** `fk_<mnem_pai>_<mnem_filho>_<descrição>`
-
+ 
+**Padrão:** `FK_<TabelaFilha>_<TabelaPai>`
+ 
 ```sql
-ALTER TABLE funcionario
-ADD CONSTRAINT fk_dept_func_lotacao
-FOREIGN KEY (func_cd_departamento)
-REFERENCES departamento (dept_cd_departamento);
+ALTER TABLE Contrato
+ADD CONSTRAINT FK_Contrato_GrupoEconomico
+FOREIGN KEY (IdGrupoEconomico)
+REFERENCES GrupoEconomico (IdGrupoEconomico);
 ```
-
+ 
 #### 5.3 Unique
-
-**Padrão:** `un_<mnemônico>_<descrição>`
-
+ 
+**Padrão:** `UQ_<Tabela>_<Descrição>`
+ 
 ```sql
-ALTER TABLE funcionario ADD CONSTRAINT un_func_cpf UNIQUE (func_nr_cpf);
-ALTER TABLE funcionario ADD CONSTRAINT un_func_matricula UNIQUE (func_nr_matricula);
+ALTER TABLE Contrato ADD CONSTRAINT UQ_Contrato_NrCnpjPcr UNIQUE (NrCnpj, NrPcr);
 ```
-
+ 
 #### 5.4 Check
-
-**Padrão:** `ck_<mnemônico>_<descrição>`
-
+ 
+**Padrão:** `CK_<Tabela>_<Descrição>`
+ 
 ```sql
 -- Templates comuns
-CHECK (campo_in_status IN ('A', 'I', 'P', 'C'))  -- Ativo, Inativo, Pendente, Cancelado
-CHECK (campo_in_ativo IN ('S', 'N'))             -- Sim, Não
-CHECK (campo_in_sexo IN ('M', 'F'))              -- Masculino, Feminino
-
--- Ou usando BOOLEAN (PostgreSQL nativo)
-CHECK (campo_in_ativo IS TRUE OR campo_in_ativo IS FALSE)
-
--- Valores monetários e numéricos
-CHECK (campo_vl_valor > 0)                       -- Maior que zero
-CHECK (campo_vl_valor >= 0)                      -- Maior ou igual a zero
-CHECK (campo_pr_percentual BETWEEN 0 AND 100)    -- Percentuais
-
--- Datas
-CHECK (campo_dt_fim >= campo_dt_inicio)          -- Data fim maior que início
-CHECK (campo_dt_nascimento < CURRENT_DATE)       -- Data no passado
-
+CHECK (InAtivo IN (0, 1))                        -- BIT nativo, não precisa de CHECK, mas exemplos análogos:
+CHECK (VlValor > 0)                              -- Maior que zero
+CHECK (PrPercentual BETWEEN 0 AND 100)           -- Percentuais
+CHECK (DtFim >= DtInicio)                        -- Data fim maior que início
+ 
 -- Exemplos práticos
-ALTER TABLE funcionario ADD CONSTRAINT ck_func_in_ativo
-CHECK (func_in_ativo IN ('S', 'N'));
-
-ALTER TABLE funcionario ADD CONSTRAINT ck_func_vl_salario
-CHECK (func_vl_salario > 0);
+ALTER TABLE Contrato ADD CONSTRAINT CK_Contrato_VlContratado
+CHECK (VlContratado > 0);
+ 
+ALTER TABLE Contrato ADD CONSTRAINT CK_Contrato_DtVigencia
+CHECK (DtFimVigencia >= DtInicioVigencia);
 ```
-
+ 
 #### 5.5 Default
-
-**Padrão:** `df_<mnemônico>_<campo>`
-
+ 
+**Padrão:** `DF_<Tabela>_<Coluna>`
+ 
 ```sql
-ALTER TABLE funcionario
-ALTER COLUMN func_in_ativo SET DEFAULT 'S';
-
-ALTER TABLE funcionario
-ALTER COLUMN func_dt_inclusao SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE Contrato
+ADD CONSTRAINT DF_Contrato_InAtivo DEFAULT (1) FOR InAtivo;
+ 
+ALTER TABLE Contrato
+ADD CONSTRAINT DF_Contrato_DhInclusao DEFAULT (SYSDATETIMEOFFSET()) FOR DhInclusao;
 ```
-
+ 
 ---
-
+ 
 ### 6. Índices
-
+ 
 #### 6.1 Índice de FK
-
-**Padrão:** `in_fk_<tabela_pai_mnem>_<tabela_filho_mnem>_<descrição>`
-
+ 
+**Padrão:** `IX_<TabelaFilha>_<Coluna>`
+ 
 ```sql
--- Template
-CREATE INDEX in_fk_[parent_mnem]_[child_mnem]_[desc]
-ON [child_table] ([fk_column]);
-
--- Exemplo
-CREATE INDEX in_fk_dept_func_lotacao
-ON funcionario (func_cd_departamento);
+CREATE INDEX IX_Contrato_IdGrupoEconomico
+ON Contrato (IdGrupoEconomico);
 ```
-
-#### 6.2 Índice Secundário
-
-**Padrão:** `in_<mnemônico>_<texto_significativo>`
-
+ 
+#### 6.2 Índice Secundário / Único
+ 
+**Padrão:** `IX_<Tabela>_<Descrição>` (o `UNIQUE` é indicado pela palavra-chave, não por prefixo diferente)
+ 
 ```sql
--- Exemplos
-CREATE INDEX in_func_cpf ON funcionario (func_nr_cpf);
-CREATE INDEX in_func_email ON funcionario (func_nm_email);
-CREATE INDEX in_func_nome ON funcionario (func_nm_completo);
+CREATE INDEX IX_Contrato_NrCnpj ON Contrato (NrCnpj);
+CREATE UNIQUE INDEX IX_Contrato_NrPcr ON Contrato (NrPcr);
 ```
-
-#### 6.3 Índice Único
-
-**Padrão:** `in_<mnemônico>_<texto_significativo>`
-
-**Observação:** Índices únicos usam o mesmo prefixo `in_` que índices comuns, diferenciando-se apenas pela palavra-chave `UNIQUE`.
-
-```sql
--- Exemplo
-CREATE UNIQUE INDEX in_func_matricula
-ON funcionario (func_nr_matricula);
-```
-
+ 
 ---
-
+ 
 ### 7. Views
-
-**Padrão:** `vw_<padrão_tabela>`
-
+ 
+**Padrão:** `Vw<NomeEntidade>`
+ 
 ```sql
-CREATE OR REPLACE VIEW vw_funcionario_ativo AS
+CREATE OR ALTER VIEW VwContratoAtivo AS
 SELECT
-    func_cd_funcionario,
-    func_nm_completo,
-    func_dt_admissao,
-    func_vl_salario
-FROM funcionario
-WHERE func_in_ativo = 'S';
-
-COMMENT ON VIEW vw_funcionario_ativo IS 'Visão de funcionários ativos';
+    IdContrato,
+    NrCnpj,
+    NrPcr,
+    DtInicioVigencia,
+    DtFimVigencia,
+    VlContratado
+FROM Contrato
+WHERE InAtivo = 1;
+GO
+ 
+EXEC sp_addextendedproperty
+    @name = N'MS_Description', @value = N'Visão de contratos ativos',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'VIEW',   @level1name = 'VwContratoAtivo';
 ```
-
+ 
 ---
-
+ 
 ### 8. Sequences
-
-**Padrão:** `seq_<mnemônico>_<campo>`
-
+ 
+**Padrão:** `Seq<Descrição>`
+ 
+> No SQL Server, para colunas de identificador de tabela, prefira **sempre** `IDENTITY(1,1)` em vez de `SEQUENCE` manual — é mais simples e é o padrão que o EF Core espera por convenção. Use `SEQUENCE` apenas quando o número precisa ser compartilhado entre múltiplas tabelas ou gerado antes do INSERT.
+ 
 ```sql
-CREATE SEQUENCE seq_func_cd_funcionario
+CREATE SEQUENCE SeqNumeroContrato
 START WITH 1
 INCREMENT BY 1
-NO MAXVALUE
-CACHE 1;
-
-COMMENT ON SEQUENCE seq_func_cd_funcionario IS 'Sequência para geração de código de funcionário';
+NO CACHE;
 ```
-
+ 
 ---
-
+ 
 ### 9. Functions
-
-**Padrão:** `fn_<sistema>_<descrição>`
-
+ 
+**Padrão:** `Fn<Descrição>`
+ 
 ```sql
-CREATE OR REPLACE FUNCTION fn_a11732_calcula_idade(
-    p_dt_nascimento DATE
-) RETURNS INTEGER AS $$
+CREATE OR ALTER FUNCTION FnCalculaIdade (@DtNascimento DATE)
+RETURNS INT
+AS
 BEGIN
-    RETURN EXTRACT(YEAR FROM AGE(CURRENT_DATE, p_dt_nascimento));
+    RETURN DATEDIFF(YEAR, @DtNascimento, GETDATE())
+        - CASE WHEN DATEADD(YEAR, DATEDIFF(YEAR, @DtNascimento, GETDATE()), @DtNascimento) > GETDATE()
+               THEN 1 ELSE 0 END;
 END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-
-COMMENT ON FUNCTION fn_a11732_calcula_idade(DATE) IS 'Calcula idade a partir da data de nascimento';
+GO
 ```
-
+ 
 ---
-
+ 
 ### 10. Stored Procedures
-
-**Padrão:** `sp_<sistema>_<descrição>_<operação>`
-
-**Operações:** `ins`, `upd`, `del`, `sel` (omitir para genérico)
-
+ 
+**Padrão:** `Usp<Descrição><Operação>`
+ 
+**Operações:** `Ins`, `Upd`, `Del`, `Sel` (omitir para genérico)
+ 
+> **Importante:** não use o prefixo `sp_` (comum em outros bancos/em código legado). No SQL Server, procedures com nome iniciado por `sp_` fazem o engine **sempre checar primeiro o banco `master`** antes do banco atual, gerando overhead de busca e risco de colisão de nome com procedures de sistema. Por isso o prefixo aqui é `Usp` (*User Stored Procedure*).
+ 
 ```sql
-CREATE OR REPLACE PROCEDURE sp_a11732_atualiza_salario_upd(
-    p_cd_funcionario INTEGER,
-    p_vl_novo_salario NUMERIC
-) LANGUAGE plpgsql AS $$
+CREATE OR ALTER PROCEDURE UspAtualizaValorContratoUpd
+    @IdContrato INT,
+    @VlNovoValor DECIMAL(15,2)
+AS
 BEGIN
-    UPDATE funcionario
-    SET func_vl_salario = p_vl_novo_salario,
-        func_dt_alteracao = CURRENT_TIMESTAMP
-    WHERE func_cd_funcionario = p_cd_funcionario;
-
-    COMMIT;
+    SET NOCOUNT ON;
+ 
+    UPDATE Contrato
+    SET VlContratado = @VlNovoValor,
+        DhAlteracao = SYSDATETIMEOFFSET()
+    WHERE IdContrato = @IdContrato;
 END;
-$$;
-
-COMMENT ON PROCEDURE sp_a11732_atualiza_salario_upd(INTEGER, NUMERIC) IS 'Atualiza salário de funcionário';
+GO
 ```
-
+ 
 ---
-
+ 
 ### 11. Triggers
-
-**Padrão:** `trg_<momento>_<mnemônico>_<operação>_<sistema>`
-
-**Momentos:** `bf` (BEFORE), `af` (AFTER), `io` (INSTEAD OF)  
-**Operações:** `ins`, `upd`, `del`, `iud` (INSERT/UPDATE/DELETE)
-
+ 
+**Padrão:** `Tr<Momento><Tabela><Operação>`
+ 
+**Momentos:** `Af` (AFTER), `Io` (INSTEAD OF) — o SQL Server não possui `BEFORE`, apenas `AFTER`/`INSTEAD OF`
+**Operações:** `Ins`, `Upd`, `Del`, `Iu` (INSERT/UPDATE combinados)
+ 
+> No T-SQL não existem os pseudo-registros `NEW`/`OLD` nem a variável `TG_OP` do PL/pgSQL. O equivalente são as tabelas virtuais **`INSERTED`** e **`DELETED`**, e a operação é inferida pela combinação de linhas presentes nelas.
+ 
 ```sql
-CREATE OR REPLACE FUNCTION fn_trg_af_func_iu()
-RETURNS TRIGGER AS $$
+CREATE OR ALTER TRIGGER TrAfContratoIu
+ON Contrato
+AFTER INSERT, UPDATE
+AS
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-        NEW.func_dt_inclusao := CURRENT_TIMESTAMP;
-    END IF;
-
-    IF TG_OP = 'UPDATE' THEN
-        NEW.func_dt_alteracao := CURRENT_TIMESTAMP;
-    END IF;
-
-    RETURN NEW;
+    SET NOCOUNT ON;
+ 
+    -- INSERT: só existem linhas em INSERTED
+    UPDATE c
+    SET DhInclusao = SYSDATETIMEOFFSET()
+    FROM Contrato c
+    INNER JOIN INSERTED i ON i.IdContrato = c.IdContrato
+    WHERE NOT EXISTS (SELECT 1 FROM DELETED d WHERE d.IdContrato = i.IdContrato);
+ 
+    -- UPDATE: linhas existem em INSERTED e em DELETED
+    UPDATE c
+    SET DhAlteracao = SYSDATETIMEOFFSET()
+    FROM Contrato c
+    INNER JOIN INSERTED i ON i.IdContrato = c.IdContrato
+    INNER JOIN DELETED d ON d.IdContrato = i.IdContrato;
 END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_af_func_iu_a11732
-    AFTER INSERT OR UPDATE ON funcionario
-    FOR EACH ROW
-    EXECUTE FUNCTION fn_trg_af_func_iu();
-
-COMMENT ON TRIGGER trg_af_func_iu_a11732 ON funcionario IS 'Atualiza timestamps de auditoria';
+GO
 ```
-
+ 
 ---
-
-### 12. Materialized Views
-
-**Padrão:** `mv_<padrão_tabela>`
-
+ 
+### 12. Views Indexadas (equivalente a Materialized Views)
+ 
+> O SQL Server **não tem `MATERIALIZED VIEW`**. O equivalente funcional é uma **view indexada**: uma view criada com `SCHEMABINDING`, com um índice clusterizado único criado sobre ela. Diferente de uma materialized view do Postgres, o conteúdo é mantido **automaticamente sincronizado** pelo engine a cada alteração nas tabelas base (não existe `REFRESH MATERIALIZED VIEW`).
+ 
+**Padrão:** `Vw<Entidade>` (mesmo padrão de views comuns)
+ 
 ```sql
-CREATE MATERIALIZED VIEW mv_funcionario_ativo AS
+CREATE OR ALTER VIEW VwContratoAtivoIdx
+WITH SCHEMABINDING
+AS
 SELECT
-    func_cd_funcionario,
-    func_nm_completo,
-    func_dt_admissao
-FROM funcionario
-WHERE func_in_ativo = 'S';
-
-CREATE UNIQUE INDEX in_mv_func_ativo_cd ON mv_funcionario_ativo (func_cd_funcionario);
-
-COMMENT ON MATERIALIZED VIEW mv_funcionario_ativo IS 'Visão materializada de funcionários ativos';
+    IdContrato,
+    NrCnpj,
+    DtInicioVigencia
+FROM dbo.Contrato
+WHERE InAtivo = 1;
+GO
+ 
+CREATE UNIQUE CLUSTERED INDEX IX_VwContratoAtivoIdx_IdContrato
+ON VwContratoAtivoIdx (IdContrato);
+GO
 ```
-
+ 
 ---
-
+ 
 ## Template Completo de Tabela
-
+ 
+> Exemplo ilustrativo do padrão aplicado — os campos abaixo servem apenas para demonstrar a convenção de nomenclatura, não representam o modelo de dados definitivo do contrato (que depende do "De-Para" e das integrações SAP/PCR/Elaw ainda em definição).
+ 
 ```sql
 -- ========================================
--- Tabela: funcionario
--- Descrição: Cadastro de funcionários
+-- Tabela: Contrato
+-- Descrição: Base contratual consolidada
 -- ========================================
-
-CREATE TABLE funcionario (
+ 
+CREATE TABLE Contrato (
     -- Chave primária (auto-incremento)
-    func_cd_funcionario INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL,
-
-    -- Dados pessoais
-    func_nm_completo VARCHAR(100) NOT NULL,
-    func_nm_email VARCHAR(80),
-    func_dt_nascimento DATE,
-    func_dt_admissao DATE NOT NULL,
-
-    -- Identificadores
-    func_nr_cpf VARCHAR(11),
-    func_nr_matricula INTEGER,
-
+    IdContrato INT IDENTITY(1,1) NOT NULL,
+ 
+    -- Identificadores de negócio
+    NrCnpj VARCHAR(14) NOT NULL,
+    NrPcr VARCHAR(20) NOT NULL,
+    CdSap VARCHAR(20) NULL,
+ 
+    -- Relacionamentos
+    IdGrupoEconomico INT NULL,
+ 
     -- Classificação
-    func_cd_cargo INTEGER,
-    func_cd_departamento INTEGER,
-
+    DsSegmento NVARCHAR(20) NOT NULL,
+ 
+    -- Vigência
+    DtInicioVigencia DATE NOT NULL,
+    DtFimVigencia DATE NOT NULL,
+ 
     -- Indicadores
-    func_in_ativo CHAR(1) DEFAULT 'S',
-
+    InAtivo BIT NOT NULL,
+ 
     -- Valores
-    func_vl_salario NUMERIC(10,2),
-    func_pr_comissao NUMERIC(5,2),
-
-    -- Quantidades
-    func_qn_dependentes INTEGER,
-
+    VlContratado DECIMAL(15,2) NULL,
+ 
+    -- Medidas / quantidades
+    MdVolumeContratado DECIMAL(10,3) NULL,
+ 
     -- Texto livre
-    func_tx_observacao TEXT,
-
+    TxObservacao NVARCHAR(MAX) NULL,
+ 
     -- Controle (auditoria)
-    func_dt_inclusao TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    func_dt_alteracao TIMESTAMP WITH TIME ZONE,
-
-    -- Constraints
-    CONSTRAINT pk_func PRIMARY KEY (func_cd_funcionario),
-    CONSTRAINT un_func_cpf UNIQUE (func_nr_cpf),
-    CONSTRAINT un_func_matricula UNIQUE (func_nr_matricula),
-    CONSTRAINT ck_func_in_ativo CHECK (func_in_ativo IN ('S', 'N')),
-    CONSTRAINT ck_func_vl_salario CHECK (func_vl_salario > 0),
-    CONSTRAINT ck_func_pr_comissao CHECK (func_pr_comissao BETWEEN 0 AND 100),
-    CONSTRAINT fk_carg_func_exercicio
-        FOREIGN KEY (func_cd_cargo)
-        REFERENCES cargo (carg_cd_cargo),
-    CONSTRAINT fk_dept_func_lotacao
-        FOREIGN KEY (func_cd_departamento)
-        REFERENCES departamento (dept_cd_departamento)
+    DhInclusao DATETIMEOFFSET NOT NULL,
+    DhAlteracao DATETIMEOFFSET NULL,
+ 
+    CONSTRAINT PK_Contrato PRIMARY KEY (IdContrato),
+    CONSTRAINT UQ_Contrato_NrPcr UNIQUE (NrPcr),
+    CONSTRAINT CK_Contrato_DtVigencia CHECK (DtFimVigencia >= DtInicioVigencia),
+    CONSTRAINT CK_Contrato_VlContratado CHECK (VlContratado > 0),
+    CONSTRAINT DF_Contrato_InAtivo DEFAULT (1) FOR InAtivo,
+    CONSTRAINT DF_Contrato_DhInclusao DEFAULT (SYSDATETIMEOFFSET()) FOR DhInclusao,
+    CONSTRAINT FK_Contrato_GrupoEconomico
+        FOREIGN KEY (IdGrupoEconomico)
+        REFERENCES GrupoEconomico (IdGrupoEconomico)
 );
-
--- Comentários obrigatórios
-COMMENT ON TABLE funcionario IS 'Cadastro de funcionários da empresa';
-COMMENT ON COLUMN funcionario.func_cd_funcionario IS 'Código único do funcionário';
-COMMENT ON COLUMN funcionario.func_nm_completo IS 'Nome completo do funcionário';
-COMMENT ON COLUMN funcionario.func_in_ativo IS 'Indicador se funcionário está ativo (S/N)';
-COMMENT ON COLUMN funcionario.func_vl_salario IS 'Salário base do funcionário';
-
+GO
+ 
+-- Documentação obrigatória
+EXEC sp_addextendedproperty
+    @name = N'MS_Description', @value = N'Base contratual consolidada (Rede/GRR/B2B)',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE',  @level1name = 'Contrato';
+ 
+EXEC sp_addextendedproperty
+    @name = N'MS_Description', @value = N'Código único do contrato',
+    @level0type = N'SCHEMA', @level0name = 'dbo',
+    @level1type = N'TABLE',  @level1name = 'Contrato',
+    @level2type = N'COLUMN', @level2name = 'IdContrato';
+ 
 -- Índices
-CREATE INDEX in_fk_carg_func_exercicio ON funcionario (func_cd_cargo);
-CREATE INDEX in_fk_dept_func_lotacao ON funcionario (func_cd_departamento);
-CREATE INDEX in_func_email ON funcionario (func_nm_email);
-CREATE INDEX in_func_nome ON funcionario (func_nm_completo);
-
--- View de funcionários ativos
-CREATE OR REPLACE VIEW vw_funcionario_ativo AS
+CREATE INDEX IX_Contrato_IdGrupoEconomico ON Contrato (IdGrupoEconomico);
+CREATE INDEX IX_Contrato_NrCnpj ON Contrato (NrCnpj);
+GO
+ 
+-- View de contratos ativos
+CREATE OR ALTER VIEW VwContratoAtivo AS
 SELECT
-    func_cd_funcionario,
-    func_nm_completo,
-    func_nm_email,
-    func_nr_matricula,
-    func_dt_admissao,
-    func_vl_salario
-FROM funcionario
-WHERE func_in_ativo = 'S';
-
+    IdContrato,
+    NrCnpj,
+    NrPcr,
+    DtInicioVigencia,
+    DtFimVigencia,
+    VlContratado
+FROM Contrato
+WHERE InAtivo = 1;
+GO
+ 
 -- Trigger de auditoria
-CREATE OR REPLACE FUNCTION fn_trg_af_func_iu()
-RETURNS TRIGGER AS $$
+CREATE OR ALTER TRIGGER TrAfContratoIu
+ON Contrato
+AFTER INSERT, UPDATE
+AS
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-        NEW.func_dt_inclusao := CURRENT_TIMESTAMP;
-    END IF;
-
-    IF TG_OP = 'UPDATE' THEN
-        NEW.func_dt_alteracao := CURRENT_TIMESTAMP;
-    END IF;
-
-    RETURN NEW;
+    SET NOCOUNT ON;
+ 
+    UPDATE c
+    SET DhAlteracao = SYSDATETIMEOFFSET()
+    FROM Contrato c
+    INNER JOIN INSERTED i ON i.IdContrato = c.IdContrato
+    INNER JOIN DELETED d ON d.IdContrato = i.IdContrato;
 END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_af_func_iu_a11732
-    AFTER INSERT OR UPDATE ON funcionario
-    FOR EACH ROW
-    EXECUTE FUNCTION fn_trg_af_func_iu();
+GO
 ```
-
+ 
 ---
-
-## Tipos de Dados Recomendados (PostgreSQL)
-
-### Códigos/Identificadores com Auto-incremento
-
-**✅ Recomendação Atual (PostgreSQL 10+): Identity Columns**
-
-Utilize `INTEGER` ou `BIGINT` com `GENERATED BY DEFAULT AS IDENTITY` para chaves primárias auto-incrementadas:
-
+ 
+## Tipos de Dados Recomendados (SQL Server)
+ 
+### Identificadores com Auto-incremento
+ 
+**✅ Recomendação: `IDENTITY(1,1)`**
+ 
 ```sql
--- Recomendado (padrão SQL:2003)
-func_cd_funcionario INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL
-PROJ_CD_PROJETO BIGINT GENERATED BY DEFAULT AS IDENTITY NOT NULL
-
--- Alternativa legada (desencorajada, mas ainda funciona)
-func_cd_funcionario SERIAL NOT NULL
+-- Recomendado
+IdContrato INT IDENTITY(1,1) NOT NULL
+IdGrupoEconomico BIGINT IDENTITY(1,1) NOT NULL
 ```
-
-**Justificativas para Identity Columns:**
-
-1. **Padrão SQL:2003** - Sintaxe portável entre SGBDs (Oracle, SQL Server, PostgreSQL)
-2. **Tipo explícito** - Deixa claro se é INTEGER ou BIGINT
-3. **Menos objetos implícitos** - SERIAL cria sequências ocultas que podem causar problemas
-4. **Melhor controle** - Permite configurações avançadas (START WITH, INCREMENT BY)
-5. **Recomendação oficial PostgreSQL** - Desde a versão 10
-
-**Referências:**
-
-- [PostgreSQL 16 Documentation - Identity Columns](https://www.postgresql.org/docs/16/ddl-identity-columns.html)
-- [PostgreSQL Wiki - Don't use SERIAL](https://wiki.postgresql.org/wiki/Don%27t_Do_This#Don.27t_use_serial)
-
-**Variações de Identity:**
-
+ 
+**Justificativas:**
+ 
+1. É o mecanismo **nativo e idiomático** do SQL Server para auto-incremento (equivalente ao `SERIAL`/`IDENTITY` do Postgres, mas sem a sintaxe `GENERATED ... AS IDENTITY` do padrão SQL:2003 — o SQL Server usa sua própria sintaxe desde sempre)
+2. É o que o **EF Core espera por convenção** para chaves primárias `int`/`long` — dispensa configuração adicional de geração de valor
+3. Permite customização via `IDENTITY(seed, increment)`
+### Tipos Recomendados por Categoria
+ 
 ```sql
--- Permite inserção manual (padrão recomendado)
-GENERATED BY DEFAULT AS IDENTITY
-
--- Proíbe inserção manual (mais restritivo)
-GENERATED ALWAYS AS IDENTITY
-
--- Com opções customizadas
-GENERATED BY DEFAULT AS IDENTITY (START WITH 1000 INCREMENT BY 1)
-```
-
-### Tipos Numéricos para Identificadores
-
-```sql
--- Códigos/Identificadores
-SMALLINT          -- Códigos pequenos (até 32.767)
-INTEGER           -- Códigos médios (até 2.147.483.647) - RECOMENDADO
-BIGINT            -- Códigos muito grandes (até 9.223.372.036.854.775.807)
-
+-- Identificadores / códigos
+INT               -- Identificadores/códigos médios — RECOMENDADO como padrão
+BIGINT            -- Identificadores muito grandes (ex.: alto volume histórico)
+SMALLINT          -- Códigos pequenos, enumerações internas
+ 
 -- Valores monetários
-NUMERIC(15,2)     -- Até 999.999.999.999,99
-NUMERIC(10,2)     -- Até 99.999.999,99
-MONEY             -- Tipo nativo PostgreSQL
-
+DECIMAL(15,2)     -- Padrão para valores monetários e financeiros (evitar FLOAT/REAL)
+DECIMAL(10,2)
+ 
 -- Percentuais e taxas
-NUMERIC(5,2)      -- Até 999,99%
-NUMERIC(3,2)      -- Até 9,99%
-
+DECIMAL(5,2)      -- Até 999,99%
+DECIMAL(3,2)      -- Até 9,99%
+ 
 -- Quantidades e medidas
-INTEGER           -- Quantidades inteiras
-NUMERIC(10,3)     -- Medidas com 3 decimais
-NUMERIC(15,6)     -- Coordenadas geográficas
-
+INT               -- Quantidades inteiras
+DECIMAL(10,3)     -- Medidas com casas decimais
+ 
 -- Textos
-CHAR(1)           -- Indicadores (S/N, A/I)
-CHAR(2)           -- UF, códigos fixos
-VARCHAR(11)       -- CPF, CNPJ
-VARCHAR(50)       -- Nomes curtos
-VARCHAR(100)      -- Nomes completos
-VARCHAR(200)      -- Descrições
-TEXT              -- Textos longos
-
+CHAR(1)           -- Indicadores textuais quando BIT não se aplica (ex.: 'S'/'N' vindo de integração)
+CHAR(2)           -- UF, siglas fixas
+VARCHAR(14)       -- CNPJ (ASCII, sem necessidade de Unicode)
+NVARCHAR(100)     -- Nomes (Unicode — acentos, caracteres especiais)
+NVARCHAR(200)     -- Descrições
+NVARCHAR(MAX)     -- Textos longos
+ 
 -- Datas
-DATE                        -- Data simples
-TIMESTAMP                   -- Data com hora
-TIMESTAMP WITH TIME ZONE    -- Data com fuso horário (recomendado)
-
+DATE                    -- Data simples, sem hora
+DATETIME2               -- Data com hora (evitar o legado DATETIME, menos preciso)
+DATETIMEOFFSET          -- Data com hora e fuso horário (recomendado para auditoria/integrações)
+ 
+-- ⚠️ Nunca usar TIMESTAMP como tipo de data — no SQL Server é sinônimo de ROWVERSION
+ 
 -- Binários
-BYTEA             -- Arquivos, imagens
-
+VARBINARY(MAX)    -- Arquivos, anexos, imagens
+ 
 -- Booleanos
-BOOLEAN           -- Alternativa a CHAR(1) para indicadores
-
+BIT               -- Tipo nativo para indicadores verdadeiro/falso
+ 
 -- JSON
-JSON              -- Dados JSON
-JSONB             -- Dados JSON binário (recomendado, mais performático)
+NVARCHAR(MAX)     -- Armazenamento de JSON (usar funções nativas ISJSON/JSON_VALUE/JSON_QUERY)
 ```
-
+ 
 ---
-
+ 
 ## Validações Comuns
-
+ 
 ```sql
--- Status e indicadores
-CHECK (campo_in_status IN ('A', 'I', 'P', 'C'))  -- Ativo, Inativo, Pendente, Cancelado
-CHECK (campo_in_ativo IN ('S', 'N'))             -- Sim, Não
-CHECK (campo_in_sexo IN ('M', 'F'))              -- Masculino, Feminino
-
--- Ou usando BOOLEAN (PostgreSQL nativo)
-CHECK (campo_in_ativo IS TRUE OR campo_in_ativo IS FALSE)
-
+-- Indicadores (BIT dispensa CHECK; CHAR(1) vindo de integração externa pode precisar)
+CHECK (CdStatusIntegracao IN ('A', 'I', 'P', 'C'))  -- Ativo, Inativo, Pendente, Cancelado
+ 
 -- Valores monetários e numéricos
-CHECK (campo_vl_valor > 0)                       -- Maior que zero
-CHECK (campo_vl_valor >= 0)                      -- Maior ou igual a zero
-CHECK (campo_pr_percentual BETWEEN 0 AND 100)    -- Percentuais
-
+CHECK (VlValor > 0)
+CHECK (VlValor >= 0)
+CHECK (PrPercentual BETWEEN 0 AND 100)
+ 
 -- Datas
-CHECK (campo_dt_fim >= campo_dt_inicio)          -- Data fim maior que início
-CHECK (campo_dt_nascimento < CURRENT_DATE)       -- Data no passado
+CHECK (DtFim >= DtInicio)
+CHECK (DtNascimento < CAST(GETDATE() AS DATE))
 ```
-
+ 
 ---
-
+ 
 ## Alternativas Consideradas
-
-### Alternativa 1: Snake_case minúsculo (padrão PostgreSQL)
-
-**Motivo da rejeição:** Embora seja o padrão de fato do PostgreSQL, optamos por MAIÚSCULAS para manter aderência aos padrões corporativos Petrobras e facilitar migração/integração com sistemas Oracle legados.
-
-### Alternativa 2: Nomenclatura sem mnemônicos
-
-**Motivo da rejeição:** Mnemônicos facilitam a identificação rápida de relacionamentos e origem de colunas em queries complexas, especialmente em JOINs.
-
-### Alternativa 3: Prefixos `tbl_`, `idx_`, `vw_`
-
-**Motivo da rejeição:** Redundantes e verbosos. O tipo de objeto já é identificado pelo contexto de uso e pelo padrão de nomenclatura específico (PK*, FK*, etc).
-
+ 
+### Alternativa 1: snake_case minúsculo
+ 
+**Motivo da rejeição:** embora funcione tecnicamente no SQL Server (a collation padrão é case-insensitive), não é a convenção idiomática do ecossistema T-SQL/.NET e criaria divergência desnecessária com o padrão de nomenclatura das entidades de domínio em C# (PascalCase), aumentando o atrito de mapeamento no EF Core.
+ 
+### Alternativa 2: Nomenclatura sem código de classe
+ 
+**Motivo da rejeição:** o código de classe (`Vl`, `Dt`, `In`, etc.) facilita a identificação rápida do propósito/tipo de um campo em queries complexas e em relatórios (ex.: Book Executivo, E6), especialmente relevante dado o volume de +20 mil contratos e múltiplas fontes de integração.
+ 
+### Alternativa 3: Manter o mnemônico da tabela como prefixo da coluna
+ 
+**Motivo da rejeição:** decisão explícita deste projeto — o nome da tabela já é explícito no contexto de qualquer JOIN/alias e nas entidades EF Core; manter o mnemônico tornaria os nomes de coluna mais longos sem ganho real de legibilidade.
+ 
 ---
-
+ 
 ## Consequências
-
+ 
 ### Positivas ✅
-
-- ✅ **Aderência aos padrões corporativos** Petrobras (PE-2TIC-00319)
-- ✅ **Rastreabilidade completa** através de nomenclatura padronizada
-- ✅ **Facilita onboarding** de novos desenvolvedores
-- ✅ **Compatibilidade** com ferramentas de análise e auditoria
-- ✅ **Documentação automatizada** através de comentários obrigatórios
-- ✅ **Queries mais legíveis** através de mnemônicos consistentes
-- ✅ **Facilita migração/integração** com sistemas Oracle legados
-- ✅ **Reduz erros** através de convenções claras
-
+ 
+- ✅ Convenção **coerente com o ecossistema .NET/EF Core** usado no projeto
+- ✅ **Rastreabilidade** via nomenclatura padronizada e extended properties
+- ✅ Facilita **onboarding** de novos desenvolvedores
+- ✅ Nomes de coluna mais **curtos e legíveis** (sem mnemônico de tabela redundante)
+- ✅ Reduz risco de armadilhas específicas do SQL Server (ex.: uso indevido de `TIMESTAMP`, prefixo `sp_`)
 ### Negativas ⚠️
-
-- ⚠️ **Nomes mais longos** devido a mnemônicos e códigos de classe
-- ⚠️ **Curva de aprendizado** inicial para equipe não familiarizada
-- ⚠️ **Diferença do padrão PostgreSQL** (snake_case minúsculo)
-- ⚠️ **Necessidade de disciplina** para manter consistência
-
+ 
+- ⚠️ Como as colunas usam código de classe (`IdContrato`, `VlContratado`), o mapeamento EF Core **não é 1:1 automático** com propriedades de domínio que não sigam o mesmo padrão — exige configuração explícita via Fluent API (`HasColumnName`) em `IEntityTypeConfiguration<T>`
+- ⚠️ Curva de aprendizado inicial para quem não está familiarizado com os códigos de classe
+- ⚠️ Necessidade de disciplina para manter consistência entre times/PRs
 ### Neutras ℹ️
-
-- ℹ️ Requer **configuração de ferramentas de qualidade** (linters, validadores)
-- ℹ️ Necessita **treinamento da equipe** nos padrões adotados
-- ℹ️ Demanda **revisão de código rigorosa** para garantir aderência
-
+ 
+- ℹ️ Requer configuração de ferramentas de qualidade (linters compatíveis com dialeto T-SQL)
+- ℹ️ Necessita alinhamento com o time de arquitetura (Yuri Najar) sobre a configuração de mapeamento EF Core (`IEntityTypeConfiguration<T>` por entidade)
+- ℹ️ Demanda revisão de código para garantir aderência, especialmente nas migrations geradas pelo EF Core
 ---
-
+ 
 ## Conformidade e Validação
-
+ 
 ### Ferramentas de Validação
-
-- **pgFormatter**: Formatação padronizada de SQL
-- **SQLFluff**: Linting de SQL
-- **Custom scripts**: Validação de nomenclatura via regex
-
+ 
+- **SQL Server Data Tools (SSDT)**: projeto de banco versionado, comparação de schema (DACPAC)
+- **SQLFluff** (dialeto `tsql`): linting de SQL
+- **Migrations do EF Core**: revisão obrigatória do script gerado antes de aplicar, para garantir aderência ao padrão (o EF Core, por convenção própria, tende a gerar nomes diferentes dos aqui definidos se não houver configuração explícita)
+- **Scripts customizados**: validação de nomenclatura via `sys.tables`/`sys.columns`
 ### Processo de Revisão
-
-1. Todo script SQL deve ser revisado quanto a aderência aos padrões
-2. CI/CD deve incluir validação automatizada de nomenclatura
+ 
+1. Todo script SQL (ou migration EF Core) deve ser revisado quanto à aderência aos padrões
+2. Pipeline Azure DevOps deve incluir validação automatizada de nomenclatura antes do deploy
 3. Code review deve verificar:
-   - ✅ Nomenclatura de objetos
-   - ✅ Presença de comentários
-   - ✅ Uso correto de tipos de dados
-   - ✅ Implementação de constraints
-
+   - ✅ Nomenclatura de objetos (PascalCase, sem underscore)
+   - ✅ Presença de extended properties (`MS_Description`)
+   - ✅ Uso correto de tipos de dados (nunca `TIMESTAMP` como data, `DECIMAL` para valores monetários)
+   - ✅ Implementação de constraints e configuração explícita de mapeamento EF Core quando necessário
 ---
-
+ 
 ## Referências
-
-- **Norma Petrobras:** PE-2TIC-00319 - Padrões de Nomenclatura de Objetos de BD
-- **Base de Conhecimento:** `@petrobrasbr-forge/dsenge-kairos-agentes/bases-conhecimento/petrobras-sql-patterns.md`
-- **Template ADR:** `@petrobrasbr-forge/dsenge-kairos-agentes/templates/001.02-template-decisao-arquitetural.md`
-- **Guia de Documentação:** `@petrobrasbr-forge/dsenge-kairos-agentes/guias/001-guia-documentacao-arquitetura.md`
-- **PostgreSQL Naming Conventions:** https://www.postgresql.org/docs/current/sql-syntax-lexical.html
-
+ 
+- **Projeto:** Sistema de Gestão de Contratos — ALE Combustíveis (PIPREVENDA-1680)
+- **Contexto de projeto:** `CONTEXTO-COMPLETO-PROJETO.md`
+- **Microsoft Docs — Identifiers:** https://learn.microsoft.com/en-us/sql/relational-databases/databases/database-identifiers
+- **Microsoft Docs — Identity Columns:** https://learn.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql-identity-property
+- **Microsoft Docs — Indexed Views:** https://learn.microsoft.com/en-us/sql/relational-databases/views/create-indexed-views
 ---
-
+ 
 ## Histórico de Revisões
-
-| Data       | Versão | Autor         | Descrição                                  |
-| ---------- | ------ | ------------- | ------------------------------------------ |
-| 2026-01-23 | 1.0    | Líder Técnico | Versão inicial - Padrões PostgreSQL a11732 |
-
+ 
+| Data       | Versão | Autor         | Descrição                                                              |
+| ---------- | ------ | ------------- | ------------------------------------------------------------------------ |
+| 2026-01-23 | 1.0    | Líder Técnico | Versão inicial (PostgreSQL, base em norma de outro cliente)             |
+| 2026-07-28 | 2.0    | Líder Técnico | Reescrito para SQL Server, projeto ALE (`mk_gestaoContrato`, localhost); nova convenção própria, sem mnemônico de tabela nas colunas |
+ 
 ---
-
+ 
 ## Aprovações
-
+ 
 | Papel                | Nome       | Data       | Assinatura |
-| -------------------- | ---------- | ---------- | ---------- |
-| Líder Técnico        | [Pendente] | [Pendente] |            |
-| Arquiteto de Solução | [Pendente] | [Pendente] |            |
-| Product Owner        | [Pendente] | [Pendente] |            |
-
+| --------------------- | ---------- | ---------- | ---------- |
+| Líder Técnico         | [Pendente] | [Pendente] |            |
+| Arquiteto de Solução  | [Pendente] | [Pendente] |            |
+| Product Manager       | [Pendente] | [Pendente] |            |
+ 
 ---
-
+ 
 ## Anexos
-
+ 
 ### Anexo A: Checklist de Validação de Scripts SQL
-
+ 
 ```markdown
-- [ ] Nomes de tabelas em minúsculas, singular, masculino
-- [ ] Nomes de colunas seguem padrão mnem_classe_descrição (minúsculas)
-- [ ] Mnemônicos de tabela respeitam regra de formação (até 4 caracteres)
-- [ ] Códigos de classe corretos (cd, ds, vl, in, dt, nm, nr, etc)
-- [ ] Constraints nomeadas conforme padrão (pk**, fk\*\_, un\_\_, ck**, df\*\*) em minúsculas
-- [ ] Índices nomeados conforme padrão (in**, in_fk**) em minúsculas
-- [ ] Comentários presentes em todas as tabelas
-- [ ] Comentários presentes em todas as colunas
-- [ ] Tipos de dados adequados e consistentes
+- [ ] Nomes de tabelas em PascalCase, singular
+- [ ] Nomes de colunas seguem padrão CódigoClasse + Descrição (PascalCase, sem mnemônico de tabela)
+- [ ] Códigos de classe corretos (Id, Cd, Ds, Vl, In, Dt, Nm, Nr, Md, Qn, Sg, Pr, Tx, Mm, Dh, Js)
+- [ ] Nenhuma coluna de data/hora nomeada ou tipada como TIMESTAMP
+- [ ] Constraints nomeadas conforme padrão (PK_, FK_, UQ_, CK_, DF_)
+- [ ] Índices nomeados conforme padrão (IX_)
+- [ ] Nenhuma procedure com prefixo sp_
+- [ ] Extended properties (MS_Description) presentes em tabelas e colunas
+- [ ] Tipos de dados adequados (DECIMAL para valores monetários, NVARCHAR para texto com acentuação, BIT para indicadores)
 - [ ] Validações (CHECK constraints) implementadas quando necessário
 - [ ] Defaults configurados onde aplicável
-- [ ] Views/Functions/Procedures seguem nomenclatura padrão em minúsculas
+- [ ] Views/Functions/Procedures/Triggers seguem nomenclatura padrão (Vw, Fn, Usp, Tr)
+- [ ] Configuração explícita de mapeamento no EF Core (HasColumnName) quando o nome de coluna difere da propriedade C#
 ```
-
+ 
 ### Anexo B: Scripts de Validação
-
+ 
 ```sql
 -- Script para validar nomenclatura de tabelas
 SELECT
-    SCHEMANAME,
-    TABLENAME,
+    s.name AS SchemaName,
+    t.name AS TableName,
     CASE
-        WHEN TABLENAME !~ '^[A-Z][A-Z0-9_]*$' THEN 'Nome contém caracteres inválidos'
-        WHEN TABLENAME ~ '.*S$' THEN 'Nome está no plural (possivelmente)'
-        WHEN LENGTH(TABLENAME) > 30 THEN 'Nome muito longo (>30 caracteres)'
+        WHEN t.name COLLATE Latin1_General_BIN LIKE '%[^a-zA-Z0-9]%' THEN 'Nome contém caracteres inválidos'
+        WHEN t.name LIKE '%s' THEN 'Nome pode estar no plural (verificar)'
+        WHEN LEN(t.name) > 30 THEN 'Nome muito longo (>30 caracteres)'
         ELSE 'OK'
-    END AS VALIDACAO
-FROM PG_TABLES
-WHERE SCHEMANAME = 'a11732'
-AND TABLENAME !~ '^(pg_|sql_)';
-
--- Script para validar comentários obrigatórios
+    END AS Validacao
+FROM sys.tables t
+INNER JOIN sys.schemas s ON s.schema_id = t.schema_id
+WHERE s.name = 'dbo';
+ 
+-- Script para validar extended properties (documentação) obrigatórias
 SELECT
-    T.SCHEMANAME,
-    T.TABLENAME,
+    s.name AS SchemaName,
+    t.name AS TableName,
     CASE
-        WHEN D.DESCRIPTION IS NULL THEN 'Comentário ausente na tabela'
+        WHEN ep.value IS NULL THEN 'Extended property (MS_Description) ausente na tabela'
         ELSE 'OK'
-    END AS VALIDACAO_TABELA
-FROM PG_TABLES T
-LEFT JOIN PG_DESCRIPTION D ON D.OBJOID = (T.SCHEMANAME||'.'||T.TABLENAME)::REGCLASS
-WHERE T.SCHEMANAME = 'a11732';
+    END AS ValidacaoTabela
+FROM sys.tables t
+INNER JOIN sys.schemas s ON s.schema_id = t.schema_id
+LEFT JOIN sys.extended_properties ep
+    ON ep.major_id = t.object_id
+    AND ep.minor_id = 0
+    AND ep.name = 'MS_Description'
+WHERE s.name = 'dbo';
+ 
+-- Script para detectar procedures com prefixo sp_ (anti-pattern no SQL Server)
+SELECT name
+FROM sys.procedures
+WHERE name LIKE 'sp[_]%';
 ```
-
+ 
 ---
-
+ 
 ### Anexo C: Lista de Verificação de Corretude do Modelo de Dados
