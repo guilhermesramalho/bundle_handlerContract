@@ -1,0 +1,829 @@
+<title>Gestão de Contratos ALE — Contexto do Projeto</title>
+<style>
+  :root{
+    --paper:#F5F6F3; --paper-raised:#FFFFFF; --ink:#171A1C; --ink-soft:#4B5358;
+    --line:#DBDFDA; --accent:#2A5C8A; --accent-soft:#E7EEF3; --accent-ink:#1B4468;
+    --ok:#2F9E5B; --ok-soft:#E3F3E9; --warn:#B8790F; --warn-soft:#FBF0DA;
+    --crit:#C9463C; --crit-soft:#FBE6E3; --mono-bg:#ECEDE9; --mono-ink:#3C4448;
+    --shadow: 0 1px 2px rgba(23,26,28,.06), 0 8px 24px -12px rgba(23,26,28,.18);
+    color-scheme: light;
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181B; --paper-raised:#1B2024; --ink:#E9EBE7; --ink-soft:#9CA6A6;
+    --line:#2B3236; --accent:#7AB0E0; --accent-soft:#1E2A33; --accent-ink:#BFE0FF;
+    --ok:#4CBE7C; --ok-soft:#17301F; --warn:#E0A83B; --warn-soft:#332711;
+    --crit:#E27268; --crit-soft:#331815; --mono-bg:#20262A; --mono-ink:#C7D0D0;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181B; --paper-raised:#1B2024; --ink:#E9EBE7; --ink-soft:#9CA6A6;
+      --line:#2B3236; --accent:#7AB0E0; --accent-soft:#1E2A33; --accent-ink:#BFE0FF;
+      --ok:#4CBE7C; --ok-soft:#17301F; --warn:#E0A83B; --warn-soft:#332711;
+      --crit:#E27268; --crit-soft:#331815; --mono-bg:#20262A; --mono-ink:#C7D0D0;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+      color-scheme: dark;
+    }
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } *{ transition:none !important; animation:none !important; } }
+
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace; }
+
+  h1,h2,h3,h4{ text-wrap:balance; font-weight:800; letter-spacing:-.01em; margin:0; }
+  p{ margin:0 0 .9em; max-width:70ch; }
+  a{ color:var(--accent); }
+  code{ font-family:inherit; }
+
+  /* ---------- Layout shell ---------- */
+  .shell{ display:grid; grid-template-columns:272px minmax(0,1fr); min-height:100vh; }
+  @media (max-width:960px){ .shell{ grid-template-columns:1fr; } }
+
+  nav.toc{
+    position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+    padding:28px 18px 40px; border-right:1px solid var(--line);
+    background:var(--paper);
+  }
+  @media (max-width:960px){
+    nav.toc{ position:relative; height:auto; border-right:none; border-bottom:1px solid var(--line); padding:16px 18px; }
+  }
+  .toc-brand{ display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
+  .toc-mark{ width:10px; height:10px; border-radius:2px; background:var(--accent); flex:none; }
+  .toc-brand b{ font-size:13px; letter-spacing:.04em; text-transform:uppercase; }
+  .toc-sub{ font-size:12px; color:var(--ink-soft); margin-bottom:20px; }
+  nav.toc ol{ list-style:none; margin:0; padding:0; counter-reset:sec; }
+  nav.toc li{ counter-increment:sec; }
+  nav.toc a{
+    display:flex; gap:8px; align-items:baseline; text-decoration:none; color:var(--ink-soft);
+    font-size:13.5px; padding:6px 8px; border-radius:6px; border-left:2px solid transparent;
+  }
+  nav.toc a::before{ content:counter(sec, decimal-leading-zero); font-family: ui-monospace, monospace; font-size:11px; color:var(--ink-soft); opacity:.6; }
+  nav.toc a:hover{ background:var(--accent-soft); color:var(--ink); }
+  nav.toc a.active{ color:var(--accent-ink); border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+  .toc-foot{ margin-top:22px; padding-top:14px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-soft); }
+
+  main{ min-width:0; }
+  .wrap{ max-width:900px; margin:0 auto; padding:0 32px 120px; }
+  @media (max-width:640px){ .wrap{ padding:0 18px 90px; } }
+
+  /* ---------- Masthead ---------- */
+  header.masthead{
+    padding:56px 32px 40px; border-bottom:1px solid var(--line);
+  }
+  @media (max-width:640px){ header.masthead{ padding:36px 18px 28px; } }
+  .mh-inner{ max-width:900px; margin:0 auto; }
+  .eyebrow{ font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .eyebrow .mono{ background:var(--mono-bg); color:var(--mono-ink); padding:2px 7px; border-radius:4px; letter-spacing:0; font-weight:600; font-size:11.5px; }
+  h1.title{ font-size:clamp(30px,5vw,44px); line-height:1.05; margin-bottom:14px; }
+  .subtitle{ font-size:18px; color:var(--ink-soft); max-width:62ch; margin-bottom:22px; }
+  .mh-facts{ display:flex; flex-wrap:wrap; gap:10px 28px; font-size:13.5px; }
+  .mh-facts div{ display:flex; flex-direction:column; gap:2px; }
+  .mh-facts .k{ text-transform:uppercase; letter-spacing:.06em; font-size:11px; color:var(--ink-soft); }
+  .mh-facts .v{ font-weight:650; }
+
+  /* ---------- Sections ---------- */
+  section{ padding:52px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  .sec-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:22px; }
+  .sec-num{ font-family: ui-monospace, monospace; font-size:13px; color:var(--accent); font-weight:700; }
+  h2.sec-title{ font-size:26px; }
+  .sec-dek{ color:var(--ink-soft); margin:-10px 0 26px; font-size:15px; }
+
+  h3{ font-size:18px; margin:30px 0 10px; }
+  h4{ font-size:14.5px; margin:20px 0 8px; color:var(--ink); }
+
+  /* ---------- Cards / grids ---------- */
+  .grid{ display:grid; gap:14px; }
+  .grid-2{ grid-template-columns:1fr 1fr; }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  @media (max-width:720px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .card h4{ margin-top:0; }
+  .card p:last-child{ margin-bottom:0; }
+
+  /* ---------- Tables ---------- */
+  .twrap{ overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); box-shadow:var(--shadow); }
+  table{ border-collapse:collapse; width:100%; font-size:14px; min-width:520px; }
+  thead th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--ink-soft); padding:10px 14px; border-bottom:1px solid var(--line); white-space:nowrap;
+    position:sticky; top:0; background:var(--paper-raised);
+  }
+  tbody td{ padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--accent-soft); }
+  td.num, th.num{ font-variant-numeric:tabular-nums; font-family:ui-monospace,monospace; font-size:13px; }
+
+  /* ---------- Chips / pills ---------- */
+  .chip{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:99px; white-space:nowrap; letter-spacing:.01em; }
+  .chip-ok{ background:var(--ok-soft); color:var(--ok); }
+  .chip-warn{ background:var(--warn-soft); color:var(--warn); }
+  .chip-crit{ background:var(--crit-soft); color:var(--crit); }
+  .chip-mono{ background:var(--mono-bg); color:var(--mono-ink); font-family:ui-monospace,monospace; }
+  .chip-accent{ background:var(--accent-soft); color:var(--accent-ink); }
+  .chip-outline{ background:transparent; border:1px solid var(--line); color:var(--ink-soft); }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+
+  /* ---------- Callouts ---------- */
+  .callout{ border-radius:10px; padding:14px 16px; border:1px solid var(--line); margin:16px 0; font-size:14.5px; }
+  .callout p:last-child{ margin-bottom:0; }
+  .callout-locked{ background:var(--ok-soft); border-color:color-mix(in srgb, var(--ok) 35%, var(--line)); }
+  .callout-open{ background:var(--warn-soft); border-color:color-mix(in srgb, var(--warn) 35%, var(--line)); }
+  .callout-risk{ background:var(--crit-soft); border-color:color-mix(in srgb, var(--crit) 35%, var(--line)); }
+  .callout-note{ background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 35%, var(--line)); }
+  .callout .lbl{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; font-weight:800; margin-bottom:6px; }
+  .callout-locked .lbl{ color:var(--ok); } .callout-open .lbl{ color:var(--warn); }
+  .callout-risk .lbl{ color:var(--crit); } .callout-note .lbl{ color:var(--accent-ink); }
+
+  /* ---------- Timeline (feedback evolution) ---------- */
+  .tl{ position:relative; margin-left:8px; padding-left:26px; border-left:2px solid var(--line); }
+  .tl-item{ position:relative; padding-bottom:34px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{ content:""; position:absolute; left:-33px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid var(--paper); box-shadow:0 0 0 2px var(--accent); }
+  .tl-date{ font-family:ui-monospace,monospace; font-size:12.5px; color:var(--accent-ink); font-weight:700; margin-bottom:3px; }
+  .tl-title{ font-weight:700; margin-bottom:8px; }
+  .tl-item ul{ margin:6px 0 0; padding-left:20px; }
+  .tl-item li{ margin-bottom:5px; font-size:14.5px; }
+
+  /* ---------- Diagram ---------- */
+  .diagram{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; align-items:center; padding:26px; border:1px solid var(--line); border-radius:12px; background:var(--paper-raised); box-shadow:var(--shadow); }
+  @media (max-width:640px){ .diagram{ grid-template-columns:1fr; } }
+  .node{ border:1px solid var(--line); border-radius:9px; padding:12px 14px; background:var(--paper); text-align:center; font-size:13px; }
+  .node b{ display:block; font-size:14px; margin-bottom:3px; }
+  .node.hub{ background:var(--accent); color:#fff; border-color:var(--accent); grid-column:2; grid-row:2; font-weight:700; padding:22px 16px; }
+  :root[data-theme="dark"] .node.hub, @media (prefers-color-scheme:dark){ .node.hub{ color:#0B1114; } }
+  .node .dir{ display:block; margin-top:5px; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); }
+  .diag-slot{ display:flex; justify-content:center; }
+
+  /* ---------- Field list (De-Para) ---------- */
+  .field{ display:inline-block; background:var(--mono-bg); color:var(--mono-ink); font-family:ui-monospace,monospace; font-size:12.5px; padding:3px 8px; border-radius:5px; margin:2px 4px 2px 0; }
+
+  /* ---------- Glossary ---------- */
+  dl.gloss dt{ font-weight:700; margin-top:16px; }
+  dl.gloss dt:first-child{ margin-top:0; }
+  dl.gloss dd{ margin:2px 0 0; color:var(--ink-soft); font-size:14.5px; }
+
+  /* ---------- Footer ---------- */
+  footer{ padding:40px 32px 60px; text-align:center; color:var(--ink-soft); font-size:12.5px; }
+
+  /* mobile toc toggle */
+  #tocToggle{ display:none; }
+  @media (max-width:960px){
+    .toc-list{ display:none; }
+    #tocToggle{ display:block; width:100%; text-align:left; background:var(--paper-raised); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-weight:700; font-size:13px; color:var(--ink); margin-top:8px; }
+    nav.toc.open .toc-list{ display:block; margin-top:14px; }
+  }
+</style>
+
+<div class="shell">
+  <nav class="toc" id="tocNav">
+    <div class="toc-brand"><span class="toc-mark"></span><b>ALE · Contratos</b></div>
+    <div class="toc-sub">PIPREVENDA‑1680 — mapa do documento</div>
+    <button id="tocToggle">Sumário ▾</button>
+    <div class="toc-list">
+      <ol>
+        <li><a href="#resumo">Leitura rápida</a></li>
+        <li><a href="#problema">O problema</a></li>
+        <li><a href="#pessoas">Cliente &amp; pessoas</a></li>
+        <li><a href="#solucao">Solução &amp; arquitetura</a></li>
+        <li><a href="#dados">Modelo de dados</a></li>
+        <li><a href="#entregaveis">Entregáveis &amp; roadmap</a></li>
+        <li><a href="#funcionalidades">Funcionalidades (F01–F21)</a></li>
+        <li><a href="#jornadas">Jornadas</a></li>
+        <li><a href="#decisoes">Decisões travadas</a></li>
+        <li><a href="#evolucao">Evolução do protótipo</a></li>
+        <li><a href="#financeiro">TIR · VPL · Reappraise · PIR</a></li>
+        <li><a href="#riscos">Registro de riscos</a></li>
+        <li><a href="#pendencias">Pendências abertas</a></li>
+        <li><a href="#glossario">Glossário</a></li>
+        <li><a href="#arquivos">Mapa de arquivos</a></li>
+      </ol>
+    </div>
+    <div class="toc-foot">Compilado a partir dos artefatos do projeto em <code class="mono">/documentos</code>. Última fonte considerada: TIR/PIR (14/07); Elaw detalhado em separado (07/07).</div>
+  </nav>
+
+  <main>
+    <header class="masthead">
+      <div class="mh-inner">
+        <div class="eyebrow"><span class="mono">PIPREVENDA-1680</span><span>Discovery / Prototipação — em iteração</span></div>
+        <h1 class="title">Sistema de Gestão de Contratos</h1>
+        <p class="subtitle">ALE Combustíveis substitui um conjunto de planilhas desconectadas — Rede, B2B, reappraise e book executivo — por um módulo satélite conectado a SAP, ao novo sistema de PCR, ao Elaw e à ANP. Contexto consolidado para o tech lead do projeto.</p>
+        <div class="mh-facts">
+          <div><span class="k">Cliente</span><span class="v">ALE Combustíveis</span></div>
+          <div><span class="k">Fornecedor</span><span class="v">Performa_IT</span></div>
+          <div><span class="k">Escala da base</span><span class="v">+20.000 contratos</span></div>
+          <div><span class="k">Plataforma</span><span class="v">Web, foco desktop</span></div>
+          <div><span class="k">Entregáveis</span><span class="v">E1–E6 · F01–F21</span></div>
+          <div><span class="k">Compilado em</span><span class="v">20/07/2026</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+
+      <!-- 1. RESUMO -->
+      <section id="resumo">
+        <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">Leitura rápida</h2></div>
+        <p class="sec-dek">Se você só tiver cinco minutos, isto é o essencial.</p>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h4>O que está sendo construído</h4>
+            <p>Uma base única de contratos (Rede + B2B) com acompanhamento automático de galonagem, análise de performance (reappraise/TIR), módulo jurídico via Elaw e um dashboard executivo — substituindo 4+ planilhas mantidas manualmente todo início de mês.</p>
+          </div>
+          <div class="card">
+            <h4>Por que agora</h4>
+            <p>A migração da ALE para o SAP cria uma lacuna: o SAP cobre faturamento e cadastro, mas não o ciclo de vida do contrato (PCRs, sucessões, performance, vencimentos). Esse sistema é o módulo satélite que fecha essa lacuna.</p>
+          </div>
+          <div class="card">
+            <h4>Onde estamos</h4>
+            <p>Protótipo funcional (Claude Design) já passou por três rodadas de validação com stakeholders (23/06, 25/06, 03/07). O CONTEXT formal é de 15/06 e já está <strong>defasado</strong> em vários pontos — ver <a href="#arquivos">nota de atualidade</a>.</p>
+          </div>
+          <div class="card">
+            <h4>Maior risco técnico</h4>
+            <p>Duas dependências externas fora do controle do projeto: as integrações SAP (do zero, sem documentação) e o novo sistema de PCR (outro fornecedor, ponto focal Natália Romão) — ambos podem atrasar a Fase 1.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-note">
+          <span class="lbl">Como este documento está organizado</span>
+          <p>As seções 1–8 seguem o CONTEXT formal (proposta, dados, entregáveis, funcionalidades). As seções 9–11 sintetizam tudo que mudou <em>depois</em> do CONTEXT — decisões de protótipo, feedback de stakeholders e o aprofundamento do modelo financeiro (TIR/PIR) — que são as partes mais prováveis de estarem desatualizadas se você só ler o CONTEXT.</p>
+        </div>
+      </section>
+
+      <!-- 2. PROBLEMA -->
+      <section id="problema">
+        <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">O problema</h2></div>
+        <p>A ALE gerencia um portfólio de <strong>+20 mil contratos</strong> — postos de rede (segmentos Rede/GRR) e clientes B2B de grande volume (COFA/COFD/COFAR) — inteiramente por planilhas Excel desconectadas, atualizadas manualmente nos primeiros dias úteis de cada mês.</p>
+
+        <div class="grid grid-2">
+          <div class="card"><h4>Planilhas fragmentadas</h4><p>Uma para Rede, outra para B2B, outra para reappraise, outra para o book executivo. Mantidas por pessoas diferentes, raramente sincronizadas entre si.</p></div>
+          <div class="card"><h4>Rotina manual mensal</h4><p>Todo início de mês, principalmente o Igor Oliveira, para tudo para atualizar galonagem, vencimentos e performance — copiando e colando entre arquivos, sujeito a erro.</p></div>
+          <div class="card"><h4>Sem visão por produto</h4><p>A base hoje só tem volume total. Não existe como saber quanto um cliente comprou de gasolina, diesel ou etanol separadamente sem um levantamento manual à parte.</p></div>
+          <div class="card"><h4>Jurídico e ANP desconectados</h4><p>Ações judiciais (Elaw) e bandeira do posto (ANP) são consultadas manualmente e cruzadas à mão com os dados de cada contrato.</p></div>
+        </div>
+
+        <div class="callout callout-risk">
+          <span class="lbl">O gatilho de urgência</span>
+          <p>A migração da ALE para o <strong>SAP</strong> não resolve isso — o SAP cuida do financeiro (faturamento, cadastro), não do ciclo de vida do contrato. Some a isso o encerramento do acesso ao <strong>SICOF</strong> após a migração, o que cria uma janela finita para extrair o histórico legado.</p>
+        </div>
+      </section>
+
+      <!-- 3. PESSOAS -->
+      <section id="pessoas">
+        <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Cliente &amp; pessoas</h2></div>
+        <p class="sec-dek">ALE Combustíveis — distribuidora de combustível, não é dona dos postos: fornece combustível e incentivos (comodato, mútuo) para revendedores sob sua bandeira. Projeto conduzido pela área de <strong>Planejamento Comercial</strong> (Ana Caldas).</p>
+
+        <h3>Time ALE Combustíveis</h3>
+        <div class="twrap"><table>
+          <thead><tr><th>Pessoa</th><th>Papel</th><th>Relevância</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Suzana Yamada</strong></td><td>Gestora de contratos</td><td>Interlocutora principal · aprovadora operacional · dona das regras de reappraise/TIR</td></tr>
+            <tr><td><strong>Ana Caldas</strong></td><td>Gerente Executiva de Planejamento</td><td>Aprovação executiva · consome dashboards, não opera o sistema</td></tr>
+            <tr><td><strong>Igor Oliveira</strong></td><td>Analista de contratos</td><td>Maior conhecimento operacional das planilhas atuais · dependência crítica (RN‑04)</td></tr>
+            <tr><td><strong>Eros Ferreira</strong></td><td>Analista de performance</td><td>Consumidor das bases para análises estratégicas</td></tr>
+            <tr><td><strong>Talita Campos</strong></td><td>Suporte operacional</td><td>Acompanhamento do projeto junto ao fornecedor</td></tr>
+            <tr><td>Nicole / Ícaro</td><td>Time de performance</td><td>Participaram das validações de protótipo (reappraise, grupo econômico)</td></tr>
+            <tr><td><strong>Lelio Lins</strong> / Daniel Sarnes</td><td>TI ALE</td><td>Referência técnica para SAP, SICOF, Data Lake</td></tr>
+            <tr><td><strong>Natália Romão</strong></td><td>Módulo de PCR (outro fornecedor)</td><td>Ponto focal crítico para integrações, reappraise, TIR e PIR</td></tr>
+            <tr><td><strong>Larissa</strong> (jurídico ALE)</td><td>Coordenadora de contratos + contencioso/recuperação de crédito</td><td>Aprova mudanças de status de processo · dona do racional de ações/subáreas · <em>homônima de Larissa Chaves (CS, Performa_IT) — pessoas diferentes</em></td></tr>
+            <tr><td><strong>Thaísa</strong></td><td>Especialista Elaw — jurídico ALE</td><td>Referência operacional do sistema Elaw · conduziu o walkthrough técnico de 07/07 · fonte primária do <a href="#elaw-doc">mapeamento de campos jurídicos</a></td></tr>
+            <tr><td>Fernanda</td><td>Jurídico ALE</td><td>Especificação dos campos de garantia (acesso ao Elaw quando o usuário do sistema não tiver)</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Time Performa_IT</h3>
+        <div class="twrap"><table>
+          <thead><tr><th>Pessoa</th><th>Papel</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Thiago Macedo</strong></td><td>Responsável pelo projeto</td></tr>
+            <tr><td>Rubens Fernandes</td><td>Product Manager</td></tr>
+            <tr><td>André Amaral</td><td>UX / Prototipação</td></tr>
+            <tr><td>Vitor</td><td>2º UX/PD — entrou em 03/07/2026, compartilhando a função com André</td></tr>
+            <tr><td><strong>Yuri Najar</strong></td><td>Arquitetura / Tecnologia — avalia viabilidade técnica das integrações</td></tr>
+            <tr><td>Larissa Chaves</td><td>Customer Success</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Personas do sistema</h3>
+        <p>Não há permissionamento por perfil na v1 — todos os usuários têm acesso equivalente. As personas orientam desenho de tela, não controle de acesso.</p>
+        <div class="grid grid-3">
+          <div class="card"><h4>Suzana — Gestora</h4><p>Visão completa em tempo real; identificar contratos em risco; relatórios sem esforço manual.</p></div>
+          <div class="card"><h4>Igor — Analista</h4><p>Eliminar a rotina mensal manual; consultar histórico de clientes com agilidade.</p></div>
+          <div class="card"><h4>Eros — Performance</h4><p>Visão por produto; cruzar performance com histórico contratual sem consolidação manual.</p></div>
+          <div class="card"><h4>Ana Caldas — Executiva</h4><p>Relatório mensal automatizado; visão de vencimentos e performance do portfólio.</p></div>
+          <div class="card"><h4>Talita — Suporte</h4><p>Acompanhamento das rotinas do time junto ao fornecedor.</p></div>
+        </div>
+      </section>
+
+      <!-- 4. SOLUCAO -->
+      <section id="solucao">
+        <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">Solução &amp; arquitetura</h2></div>
+        <p>Módulo satélite: centraliza o que hoje está disperso, orientado ao contrato (PCR/PCF), com visão tanto por CNPJ quanto por contrato. Sistema é <strong>consultivo</strong> — nenhum dado é cadastrado manualmente pelo usuário; tudo chega via integração.</p>
+
+        <div class="diagram" role="img" aria-label="Diagrama de integrações: SAP bidirecional, PCR e Elaw de entrada, Data Lake de saída, ANP a definir, todos conectados ao Sistema de Gestão de Contratos">
+          <div class="diag-slot"><div class="node"><b>SAP</b>cadastro · faturamento<span class="dir">bidirecional</span></div></div>
+          <div class="diag-slot"><div class="node"><b>Novo sistema de PCR</b>(+ PCR 700 fallback)<span class="dir">entrada — contratual</span></div></div>
+          <div class="diag-slot"></div>
+          <div class="diag-slot"><div class="node"><b>Elaw</b>jurídico<span class="dir">entrada — sujeito a API (RT‑05)</span></div></div>
+          <div class="diag-slot"><div class="node hub">Sistema de Gestão<br>de Contratos</div></div>
+          <div class="diag-slot"><div class="node"><b>Data Lake ALE</b>base consolidada<span class="dir">saída — para BI</span></div></div>
+          <div class="diag-slot"></div>
+          <div class="diag-slot"><div class="node"><b>ANP</b>bandeira do posto<span class="dir">mecanismo a definir</span></div></div>
+          <div class="diag-slot"></div>
+        </div>
+
+        <h3>Carga de dados históricos</h3>
+        <p>Executada como <strong>back-office</strong> pelo time de desenvolvimento — não é feature de usuário. Fonte: planilhas atuais + extração do SICOF dentro da janela de acesso disponível (encerra após a migração para o SAP). Sem integração contínua com o SICOF, apenas carga avulsa inicial. Escopo e profundidade a confirmar com TI ALE / Lelio Lins.</p>
+      </section>
+
+      <!-- 5. DADOS -->
+      <section id="dados">
+        <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">Modelo de dados</h2></div>
+        <p class="sec-dek">Fonte: <code class="mono">[INSUMO] De‑Para — Gestão de Contratos.xlsx</code>, o mapeamento campo‑a‑campo entre as planilhas atuais e o novo sistema. Estrutura em três blocos.</p>
+
+        <h3>Segmentos, tipos de contrato e guarda‑chuva</h3>
+        <div class="grid grid-2">
+          <div class="card">
+            <h4>Segmentos</h4>
+            <div class="tag-row">
+              <span class="chip chip-ok">Rede — ativo</span>
+              <span class="chip chip-outline">GRR — rede em depuração</span>
+              <span class="chip chip-ok">COFA / COFD / COFAR — B2B ativo</span>
+              <span class="chip chip-outline">Outros — B2B em depuração</span>
+              <span class="chip chip-outline">Spot — sem contrato</span>
+            </div>
+          </div>
+          <div class="card">
+            <h4>Tipos de contrato</h4>
+            <div class="tag-row">
+              <span class="chip chip-accent">PCVM — volume mínimo obrigatório</span>
+              <span class="chip chip-outline">Imagem — sem mínimo (Rede, em descontinuação)</span>
+              <span class="chip chip-outline">Comodato — sem mínimo (B2B)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-note">
+          <span class="lbl">Guarda-chuva: lógica de galonagem diverge por segmento</span>
+          <p><strong>Rede</strong> — cada CNPJ adicional tem galonagem individual, com visão consolidada do grupo também disponível.<br><strong>B2B (COFA/COFD/COFAR)</strong> — galonagem <strong>global</strong>, compartilhada por todos os CNPJs vinculados. Não é individual por CNPJ.</p>
+        </div>
+
+        <h3>Campos mapeados — base Rede</h3>
+        <p>Origem principal: SICOF SIG / SAP (cadastro), PCR 700 / novo PCR (contratual), Elaw (jurídico), ANP (bandeira).</p>
+        <div>
+          <span class="field">Diretoria</span><span class="field">Gerente Regional</span><span class="field">RN</span><span class="field">Consultor Comercial</span>
+          <span class="field">CNPJ Atual / Sucedido</span><span class="field">Razão Social Atual / Sucedida</span><span class="field">Grupo</span>
+          <span class="field">Sit. Mês Vigente</span><span class="field">N° PCR</span><span class="field">Finalidade da PCR</span>
+          <span class="field">Início / Fim Contrato</span><span class="field">Tipo Contrato (PCVM/Imagem)</span><span class="field">Vol. Mensal</span>
+          <span class="field">Galonagem Contratada</span><span class="field">Galonagem Faturada</span><span class="field">Saldo</span><span class="field">% Cumprimento</span>
+          <span class="field">Vencto. Galonagem</span><span class="field">Situação Galonagem</span><span class="field">Vencto. Prazo</span>
+          <span class="field">Status Denúncia Contratual</span><span class="field">Vol. Médio 6/12 meses</span>
+          <span class="field">Etanol</span><span class="field">Gasolina C</span><span class="field">Gasolina Adt</span><span class="field">Diesel S10</span><span class="field">Diesel S500</span><span class="field">Diesel S10A</span><span class="field">GNV</span><span class="field">Lubrificantes</span><span class="field">Outros produtos</span>
+          <span class="field">Guarda-chuva P/A</span><span class="field">Ação Judicial em Andamento</span><span class="field">Qtde. Notificações</span><span class="field">Data Última Notificação</span><span class="field">Qtde. Ações Ativas (total)</span>
+          <span class="field">ANP — última consulta</span>
+        </div>
+
+        <h3>Campos mapeados — bloco B2B / guarda-chuva</h3>
+        <div>
+          <span class="field">PCR/PCF</span><span class="field">Contrato</span><span class="field">Finalidade PCF/PCR</span><span class="field">Tipo de Contrato</span>
+          <span class="field">Qtd. CNPJs vinculados</span><span class="field">Segmento</span><span class="field">Ativo/Inativo (por contrato)</span>
+          <span class="field">Realizado até mês ref. (por contrato)</span><span class="field">Saldo (por contrato)</span><span class="field">% Cumprimento (por contrato)</span>
+          <span class="field">Vol. Médio 6m (por contrato)</span><span class="field">Cláusula de compensação</span><span class="field">Data última compra</span>
+        </div>
+
+        <h3>Campos novos identificados (não existem hoje)</h3>
+        <div>
+          <span class="field">Mecanismo de cálculo de multa</span><span class="field">Margem unitária (?)</span>
+          <span class="field">Incidência de compra no mês vigente</span><span class="field">Colunas contratado/realizado por produto (2 novas por produto)</span>
+        </div>
+
+        <p style="margin-top:18px"><strong>Identificadores distintos —</strong> confirmado nas reuniões de protótipo: <span class="field">N° PCR/PCF</span> identifica o <em>contrato</em> (número único, prefixo muda por Rede/B2B); <span class="field">N° SAP do cliente</span> identifica o <em>cliente</em> (10 dígitos, formato <code class="mono">1000######</code>); <span class="field">código SAP do grupo</span> identifica o <em>grupo econômico</em> (3 dígitos).</p>
+      </section>
+
+      <!-- 6. ENTREGAVEIS -->
+      <section id="entregaveis">
+        <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">Entregáveis &amp; roadmap</h2></div>
+        <p class="sec-dek">Entrega incremental por fases — sugestão da proposta, forma definitiva a acordar com o cliente.</p>
+
+        <div class="twrap"><table>
+          <thead><tr><th class="num">ID</th><th>Entregável</th><th>O que faz</th><th>Integrações</th></tr></thead>
+          <tbody>
+            <tr><td class="num">E1</td><td><strong>Base Contratual Consolidada</strong></td><td>Substitui planilhas Rede + B2B por base única, visão por CNPJ e por contrato, todos os segmentos, ciclo de vida completo</td><td>SAP (cadastro), PCR (contratual)</td></tr>
+            <tr><td class="num">E2</td><td><strong>Acompanhamento de Performance</strong></td><td>Galonagem mensal automatizada, visão por produto, projeção de vencimento, relatório mensal</td><td>SAP/Faturamento, PCR, Data Lake</td></tr>
+            <tr><td class="num">E3</td><td><strong>Reappraise (Análise de Performance)</strong></td><td>Gráfico realizado x contratado (volume, margem), TIR realizada x projetada</td><td>SAP/Faturamento, PCR</td></tr>
+            <tr><td class="num">E4</td><td><strong>Módulo Jurídico</strong></td><td>Ações de rescisão, notificações, contagem de ações ativas — via Elaw</td><td>Elaw (sujeito a API — RT‑05)</td></tr>
+            <tr><td class="num">E5</td><td><strong>Integrações SAP e Data Lake</strong></td><td>Entregável técnico transversal: faturamento, cadastro, publicação Data Lake, bandeira ANP</td><td>SAP, Data Lake, ANP</td></tr>
+            <tr><td class="num">E6</td><td><strong>Book de Contratos (Executivo)</strong></td><td>Dashboard de portfólio, funil de vencimentos, histórico de inaugurações/renovações, exportação</td><td>Consome E1–E3, sem novas integrações</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Fases</h3>
+        <div class="tl">
+          <div class="tl-item"><div class="tl-date">Fase 1 — Fundação</div><div class="tl-title">E1 + E5 (parcial)</div><p>Base contratual consolidada, integração PCR e SAP cadastral, carga de legado.</p></div>
+          <div class="tl-item"><div class="tl-date">Fase 2 — Performance</div><div class="tl-title">E2 + E5 (complemento)</div><p>Acompanhamento mensal automatizado, visão por produto, filtro de vencimentos, faturamento SAP, publicação Data Lake.</p></div>
+          <div class="tl-item"><div class="tl-date">Fase 3 — Visão Executiva</div><div class="tl-title">E6</div><p>Book de contratos / dashboard gerencial.</p></div>
+          <div class="tl-item"><div class="tl-date">Fase 4 — Análise e Gestão</div><div class="tl-title">E3 + E4</div><p>Análise gráfica de performance, retorno financeiro, integração Elaw, módulo jurídico.</p></div>
+        </div>
+
+        <div class="callout callout-open">
+          <span class="lbl">Sem data-alvo travada</span>
+          <p>O cliente tem preferência por alinhar ao cronograma da PCR (referência: julho/2026), mas isso é tratado como <em>referência</em>, não restrição (risco RP‑01). Investimento e condições comerciais ainda não preenchidos na proposta.</p>
+        </div>
+      </section>
+
+      <!-- 7. FUNCIONALIDADES -->
+      <section id="funcionalidades">
+        <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title">Funcionalidades — F01 a F21</h2></div>
+        <p class="sec-dek">Cada funcionalidade tem documento de refinamento próprio no CONTEXT (propósito, regras, entradas/saídas, critérios de aceite). Agrupadas aqui por entregável.</p>
+
+        <h3><span class="chip chip-mono">E1</span> Base contratual</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">F</th><th>Funcionalidade</th><th>Persona</th></tr></thead>
+          <tbody>
+            <tr><td class="num">F01</td><td>Visualização de contratos por CNPJ e por PCR/PCF</td><td>Igor, Suzana</td></tr>
+            <tr><td class="num">F02</td><td>Visualização de guarda-chuva (principal + adicionais)</td><td>Igor, Suzana</td></tr>
+            <tr><td class="num">F03</td><td>Eventos do ciclo de vida contratual (novo negócio, renovação, readequação, cessão/sucessão, denúncia, encerramento)</td><td>Igor, Suzana</td></tr>
+            <tr><td class="num">F04</td><td>Filtros e busca avançada (combináveis)</td><td>Igor, Eros, Suzana</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3><span class="chip chip-mono">E2</span> Performance / galonagem</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">F</th><th>Funcionalidade</th><th>Persona</th></tr></thead>
+          <tbody>
+            <tr><td class="num">F05</td><td>Galonagem por contrato: contratado, faturado, saldo, % cumprimento</td><td>Igor, Eros, Suzana</td></tr>
+            <tr><td class="num">F06</td><td>Volume médio configurável (até 12 meses)</td><td>Igor, Eros</td></tr>
+            <tr><td class="num">F07</td><td>Projeção de vencimento por galonagem</td><td>Igor, Suzana</td></tr>
+            <tr><td class="num">F08</td><td>Situação de galonagem: vigente ou vencido</td><td>Igor, Suzana</td></tr>
+            <tr><td class="num">F09</td><td>Quebra por produto: contratado x realizado</td><td>Eros, Suzana</td></tr>
+            <tr><td class="num">F10</td><td>Contrato Greenfield e curva de maturação</td><td>Igor</td></tr>
+            <tr><td class="num">F11</td><td>Relatório mensal automatizado (Excel/PDF)</td><td>Suzana, Ana Caldas</td></tr>
+            <tr><td class="num">F12</td><td>Filtro por proximidade de vencimento (prazo e galonagem)</td><td>Suzana, Igor</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3><span class="chip chip-mono">E3</span> Reappraise</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">F</th><th>Funcionalidade</th><th>Persona</th></tr></thead>
+          <tbody>
+            <tr><td class="num">F13</td><td>Visão gráfica realizado x contratado (volume, margem)</td><td>Suzana, Eros</td></tr>
+            <tr><td class="num">F14</td><td>TIR realizada x projetada (condicional à PCR)</td><td>Suzana</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3><span class="chip chip-mono">E4</span> Jurídico</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">F</th><th>Funcionalidade</th><th>Persona</th></tr></thead>
+          <tbody>
+            <tr><td class="num">F15</td><td>Informações jurídicas por contrato (Elaw)</td><td>Suzana, Igor</td></tr>
+            <tr><td class="num">F16</td><td>Filtro de contratos com eventos jurídicos por período</td><td>Suzana</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3><span class="chip chip-mono">E5 / E6</span> Integrações e visão executiva</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">F</th><th>Funcionalidade</th><th>Persona</th></tr></thead>
+          <tbody>
+            <tr><td class="num">F17</td><td>Bandeira ANP por posto + data da verificação</td><td>Igor</td></tr>
+            <tr><td class="num">F18</td><td>Dashboard executivo de portfólio</td><td>Ana Caldas, Suzana</td></tr>
+            <tr><td class="num">F19</td><td>Funil de vencimentos (atalhos 1/3/6/12 meses)</td><td>Ana Caldas, Suzana</td></tr>
+            <tr><td class="num">F20</td><td>Histórico de inaugurações e renovações</td><td>Ana Caldas, Suzana</td></tr>
+            <tr><td class="num">F21</td><td>Exportação de relatórios (Excel/PDF)</td><td>Ana Caldas, Suzana</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- 8. JORNADAS -->
+      <section id="jornadas">
+        <div class="sec-head"><span class="sec-num">08</span><h2 class="sec-title">Jornadas</h2></div>
+        <div class="grid grid-2">
+          <div class="card"><h4>J1 — Consulta e Análise de um Contrato</h4><p><strong>Igor, Suzana</strong> · E1, E2, E3 · Busca um contrato, vê dados, histórico, performance, jurídico. Tudo pré-atualizado via integração.</p></div>
+          <div class="card"><h4>J2 — Acompanhamento Mensal da Base</h4><p><strong>Igor</strong> (+ Talita) · E1, E2 · Substitui a rotina manual dos primeiros dias úteis; base já reflete o fechamento do SAP.</p></div>
+          <div class="card"><h4>J3 — Identificação de Contratos por Vencer</h4><p><strong>Suzana</strong> (+ Igor, Ana) · E2, E6 · Filtro por prazo ou por galonagem, na base detalhada ou no book.</p></div>
+          <div class="card"><h4>J4 — Contratos com Eventos Jurídicos</h4><p><strong>Suzana</strong> · E4 · Filtra ou consulta eventos jurídicos vindos do Elaw.</p></div>
+          <div class="card"><h4>J5 — Visão Executiva do Portfólio</h4><p><strong>Ana Caldas</strong> (+ Suzana) · E6, E2 · Dashboard, filtros de vencimento, histórico, exportação.</p></div>
+        </div>
+      </section>
+
+      <!-- 9. DECISOES -->
+      <section id="decisoes">
+        <div class="sec-head"><span class="sec-num">09</span><h2 class="sec-title">Decisões já travadas</h2></div>
+        <p class="sec-dek">Validadas com o cliente ou definidas internamente. Não reabrir sem justificativa.</p>
+
+        <div class="callout callout-locked"><span class="lbl">Plataforma &amp; permissionamento</span><p>Web, foco desktop, responsivo para tablet/mobile. Sem controle de perfis de acesso na v1 — todos os usuários têm acesso equivalente. Sem salvar combinações de filtro na v1 (filtros são voláteis por sessão). Log de auditoria: sim — quem alterou, o quê e quando.</p></div>
+
+        <div class="callout callout-locked"><span class="lbl">Vencimento e galonagem</span><p>Duas colunas de vencimento coexistem: contratual e projetado por galonagem (12 meses, ou o histórico disponível se for menor). Chip de status permanece <span class="chip chip-crit">vermelho</span> tanto para vencido por galonagem quanto por data — quem diferencia é a <strong>barra de galonagem</strong>: verde (cumpriu / vencido por galonagem) vs. vermelho (não cumpriu / vencido por data). Guarda-chuva Rede = galonagem individual; guarda-chuva B2B = galonagem global.</p></div>
+
+        <div class="callout callout-locked"><span class="lbl">Identificação</span><p>N° SAP do cliente (10 dígitos) e N° PCR/PCF (contrato) são identificadores distintos e coexistem na tela. Código SAP do grupo econômico: 3 dígitos. Grupo econômico é coluna + busca por texto — não filtro dropdown.</p></div>
+
+        <div class="callout callout-locked"><span class="lbl">Reappraise / performance</span><p>Linha superior de gráficos: Volume · Margem · Investimento · Contribuição marginal. TIR fica em bloco separado abaixo. Tag de status (OK/Recuperação/Crítico) é <strong>colorida</strong>, não ícone de farol.</p></div>
+
+        <div class="callout callout-locked"><span class="lbl">Carga &amp; integrações</span><p>Carga de legado é back-office (equipe de desenvolvimento), não feature de usuário. Sem integração contínua com SICOF — apenas carga avulsa inicial. Notificações: e-mail como canal principal, com abertura futura para Teams/WhatsApp.</p></div>
+      </section>
+
+      <!-- 10. EVOLUCAO -->
+      <section id="evolucao">
+        <div class="sec-head"><span class="sec-num">10</span><h2 class="sec-title">Evolução do protótipo</h2></div>
+        <p class="sec-dek">O CONTEXT (15/06) foi o ponto de partida. As quatro rodadas de validação abaixo mudaram, ampliaram ou destravaram pontos do escopo original — nesta ordem cronológica.</p>
+
+        <div class="tl">
+          <div class="tl-item">
+            <div class="tl-date">23/06/2026 — Nicole (time de performance)</div>
+            <div class="tl-title">Foco: listagem e reappraise</div>
+            <ul>
+              <li>Filtro de UF adicionado (atributo geográfico independente da hierarquia comercial)</li>
+              <li>TIR precisa de terceiro componente: investimento (além de volume e margem) → gráfico de investimento aprovado x realizado</li>
+              <li>Novo gráfico: contribuição marginal (volume total × margem unitária, "dinheiro real" do contrato)</li>
+              <li>Tag de status do reappraise no cabeçalho: verde/amarelo/vermelho, cor sólida — não farol</li>
+              <li>Elaw: escopo ampliado de "só rescisão" para todas as ações ativas do CNPJ (bloqueado por API)</li>
+            </ul>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">25/06/2026 — Ana Caldas &amp; Ícaro</div>
+            <div class="tl-title">Foco: visão executiva e detalhe do contrato</div>
+            <ul>
+              <li>Coluna "Venc. projetado" adicionada à listagem — coexiste com o vencimento contratual</li>
+              <li>Status de vencimento desdobrado em vencido por galonagem (positivo) x por data (negativo), diferenciados pela barra de galonagem</li>
+              <li>N° SAP do cliente exibido junto de CNPJ/Razão Social</li>
+              <li>Indicador de garantia (sim/não + "ver detalhes", placeholder) e de sublocação (~50 postos afetados)</li>
+              <li>Aba <strong>PIR</strong> criada como placeholder — conceito novo, não previsto no CONTEXT original</li>
+              <li><span class="chip chip-warn">Em aberto</span> — dashboard para relatórios de diretoria/Glencore, bloqueado até Ana enviar os formatos atuais</li>
+            </ul>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">29/06/2026 — Alinhamento interno Performa_IT</div>
+            <div class="tl-title">Consolidação de decisões antes de iterar</div>
+            <ul>
+              <li>Confirmado: guarda-chuva B2B tem galonagem global; Rede permanece individual</li>
+              <li>Listagem mantida por PCR (não por CNPJ) até confirmar se um CNPJ pode ter mais de uma PCR ativa simultaneamente</li>
+              <li>Hierarquia comercial do SAP está correta (Nicole havia questionado) — resolvido com filtro em cascata multi-seleção</li>
+            </ul>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">03/07/2026 — Suzana, Ana Caldas, Lelio Lins, Igor, Natália Romão</div>
+            <div class="tl-title">Reunião mais recente e mais substancial</div>
+            <ul>
+              <li><strong>Regra nova:</strong> quando o vencimento projetado por galonagem ficar <em>depois</em> do vencimento contratual, a data projetada é pintada em vermelho — sinaliza risco de não-cumprimento no prazo</li>
+              <li>Hierarquia comercial simplificada: remove Gerente Executivo, 2º nível Regional e Supervisor; mantém Diretor, Gerente Regional, Coordenador; renomeia "Representante Comercial" → "Consultor Comercial" (origem: Lelio Lins)</li>
+              <li>Nova seção: <strong>racional auditável do cálculo da TIR</strong> — tabela com 3 colunas (PCR Contratada / Realizado / Negociação atualizada) × linhas de Performance, Investimentos e Devolução Financeira — algumas linhas ainda não confirmadas por Suzana</li>
+              <li><strong>Funcionalidade nova mapeada, não aprovada para escopo:</strong> sistema de gatilhos e alertas automatizados para jurídico/comercial (ex.: cliente saiu da bandeira ANP, contrato venceu sem cumprimento). Depende da lista de gatilhos do Igor e do aval técnico do Yuri antes de entrar no protótipo ou no cronograma</li>
+            </ul>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">06–07/07/2026 — Larissa &amp; Thaísa (jurídico ALE), Lelio Lins</div>
+            <div class="tl-title">Duas reuniões técnicas dedicadas ao Elaw — a rodada mais profunda de descoberta de dados do projeto</div>
+            <ul>
+              <li>06/07 — validação do protótipo com o time jurídico: escopo da aba jurídica ampliado de "só rescisão" para <strong>todas as ações ativas do CNPJ</strong> (rescisão, recuperação de crédito, reintegração de posse, real estate); container deve se chamar "Ações ativas no Elaw", não mais "ações de rescisão"</li>
+              <li>07/07 — walkthrough completo do sistema Elaw com Thaísa: mapeamento campo a campo de notificações, processos/contencioso, workflow de assinatura de contrato e ciclo de vida jurídico completo — ver <a href="#elaw-doc">documento dedicado</a></li>
+              <li>Confirmado: CNPJ é a chave de busca, mas com risco de inconsistência em grupos econômicos com múltiplas razões sociais sob uma "parte principal" (caso relatado: 32 razões sociais, só 1 aparece em relatório padrão)</li>
+              <li>Confirmado que <strong>não existe hoje</strong> prognóstico de êxito para processos em que a ALE é ré (polo passivo) — pedido de Suzana não pode ser atendido via API automática</li>
+              <li>Confirmado que a vinculação entre notificação grau 3 e abertura de pré-cadastro é <strong>manual</strong> hoje (controle por planilha do time jurídico) — não é uma transição automática rastreável</li>
+              <li>Ideia em aberto, não decidida: link de deep-link do produto direto para o registro correspondente no Elaw (depende de mapear quem tem acesso ao Elaw e quem não tem)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout callout-open">
+          <span class="lbl">Novo participante</span>
+          <p>Vitor entrou no projeto em 03/07/2026 como segundo UX/PD da Performa_IT, dividindo a função com André Amaral.</p>
+        </div>
+
+        <div class="callout callout-note" id="elaw-doc">
+          <span class="lbl">Documento complementar</span>
+          <p>O detalhamento completo de todos os campos jurídicos mapeados a partir do Elaw — com status de confirmação e sugestão de objetos de transporte (DTOs) para a integração — está no documento <strong>"Integração Elaw — Dados Jurídicos &amp; Contrato de API"</strong>, publicado em separado para uso direto da arquitetura (Yuri Najar).</p>
+        </div>
+      </section>
+
+      <!-- 11. FINANCEIRO -->
+      <section id="financeiro">
+        <div class="sec-head"><span class="sec-num">11</span><h2 class="sec-title">TIR · VPL · Reappraise · PIR</h2></div>
+        <p class="sec-dek">A parte que mais evoluiu depois do CONTEXT. Fonte: reunião de 10/07/2026 com Natália Romão (time de investimentos ALE) — documento atualizado em 14/07, o artefato mais recente do projeto.</p>
+
+        <div class="callout callout-risk">
+          <span class="lbl">Mudança de escopo relevante</span>
+          <p>O CONTEXT original (F14) previa que a <strong>TIR chegaria pronta da PCR</strong>, sem cálculo no sistema. A reunião com Natália revelou o contrário: o sistema precisa reconstruir o <strong>fluxo de caixa completo</strong> do contrato para calcular TIR, VPL, payback e comprometimento de margem — quatro indicadores, não um. Isso é um aumento real de complexidade para o E3, não só um refinamento de UI.</p>
+        </div>
+
+        <h3>Três camadas de análise, profundidade crescente</h3>
+        <div class="twrap"><table>
+          <thead><tr><th></th><th>Reappraise</th><th>TIR</th><th>PIR</th></tr></thead>
+          <tbody>
+            <tr><td><strong>O que mede</strong></td><td>Volume e margem de contribuição</td><td>Retorno financeiro via fluxo de caixa completo</td><td>Fluxo de caixa real vs. aprovado na PCR</td></tr>
+            <tr><td><strong>Variáveis</strong></td><td>2 (volume + margem)</td><td>Volume, margem, engenharia, mútuo, rebate, custo de servir, impostos, CAPEX</td><td>Todas as da TIR + caso base, greenfield, varejo</td></tr>
+            <tr><td><strong>Frequência</strong></td><td>Automático, mensal</td><td>Contínuo (3 versões)</td><td>Periódica, deliberada</td></tr>
+            <tr><td><strong>Resultado</strong></td><td>Status: <span class="chip chip-ok">OK</span> <span class="chip chip-warn">Recuperação</span> <span class="chip chip-crit">Crítico</span></td><td>TIR, VPL, payback, comprometimento de margem</td><td>Diagnóstico completo do investimento</td></tr>
+            <tr><td><strong>Status no sistema</strong></td><td>Já implementado (regras de classificação ainda pendentes)</td><td>Em especificação</td><td>Placeholder — sessão dedicada pós-lançamento da PCR (~ago/2026)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="callout callout-open">
+          <span class="lbl">Limitação conhecida do reappraise</span>
+          <p>Não considera o <strong>rebate</strong> pago ao cliente. Um contrato pode parecer com boa margem (ex.: R$200/m³) mas, descontado o rebate (ex.: R$50), a margem real é R$150 — o reappraise atual pode mascarar isso. Ponto a discutir com Ana Caldas antes de qualquer decisão de implementação.</p>
+        </div>
+
+        <h3>As três versões da TIR</h3>
+        <div class="grid grid-3">
+          <div class="card"><h4>TIR Contratada</h4><p>Calculada na aprovação, com base nas projeções originais. Fixa — nunca muda depois.</p></div>
+          <div class="card"><h4>TIR Realizada</h4><p>Com base no que efetivamente aconteceu até hoje: volume, margem, investimento realizados.</p></div>
+          <div class="card"><h4>TIR Projetada</h4><p>Estimativa de como a TIR fecha se o ritmo atual continuar.</p></div>
+        </div>
+        <div class="callout callout-risk">
+          <span class="lbl">Bloqueio técnico confirmado</span>
+          <p>A TIR Projetada <strong>não pode ser calculada</strong> com os dados que o sistema tem hoje — faltam receitas de varejo e parâmetros históricos aprovados mapeados. Por ora aparece no protótipo apenas como referência visual.</p>
+        </div>
+
+        <h3>Duas regras técnicas com impacto direto na especificação</h3>
+        <div class="grid grid-2">
+          <div class="card"><h4>Parâmetros históricos, não atuais</h4><p>Cada contrato foi aprovado com parâmetros vigentes na época (custo de servir, taxa de juros, WOC). A TIR precisa usar os parâmetros <em>daquele momento</em>, não os atuais — senão a comparação fica distorcida.</p></div>
+          <div class="card"><h4>Mudança de metodologia a partir de ago/2026</h4><p>Contratos aprovados até jul/2026 usam <em>replacement margin</em>; a partir de ago/2026, <em>lucro bruto</em> (linha diferente do DRE). O sistema precisa indicar a metodologia aplicada, determinada pela data de aprovação do contrato.</p></div>
+        </div>
+
+        <h3>Por que a PIR é mais complexa que a TIR</h3>
+        <p><strong>Caso base</strong> — em renovações, meses restantes do contrato anterior já foram contabilizados e não podem ser contados de novo. <strong>Greenfield</strong> — atraso na abertura de um posto novo (ex.: projetado 3 meses, realizado 12) destrói o resultado financeiro do contrato. <strong>Varejo</strong> — receitas de loja/conveniência que a TIR básica não considera; se a loja nunca abriu, o problema está ali, não no combustível.</p>
+      </section>
+
+      <!-- 12. RISCOS -->
+      <section id="riscos">
+        <div class="sec-head"><span class="sec-num">12</span><h2 class="sec-title">Registro de riscos</h2></div>
+        <p class="sec-dek">Probabilidade: Alta &gt;60% · Média 30–60% · Baixa &lt;30%. Impacto: Alto (prazo/escopo total) · Médio (módulo/fase) · Baixo (contornável).</p>
+
+        <h3>Técnicos</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">ID</th><th>Risco</th><th>Prob.</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr><td class="num">RT-01</td><td>Novo sistema de PCR sem API/contrato de integração a tempo da Fase 1</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-crit">Alto</span></td></tr>
+            <tr><td class="num">RT-02</td><td>Integrações SAP do zero, sem documentação técnica</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-crit">Alto</span></td></tr>
+            <tr><td class="num">RT-03</td><td>Acesso ao SICOF encerra após migração SAP — janela finita para carga de legado</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+            <tr><td class="num">RT-04</td><td>Extração do PCR 700 é lenta (~3h) e pode não ser reproduzível no novo ambiente</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+            <tr><td class="num">RT-05</td><td>Elaw pode não ter API disponível</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-ok">Baixo</span></td></tr>
+            <tr><td class="num">RT-06</td><td>Margem unitária por contrato pode não estar disponível na PCR</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-ok">Baixo</span></td></tr>
+            <tr><td class="num">RT-07</td><td>+20 mil contratos podem gerar problemas de performance de tela</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Prazo</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">ID</th><th>Risco</th><th>Prob.</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr><td class="num">RP-01</td><td>Preferência do cliente pelo cronograma da PCR (jul/2026) pode pressionar prazo incompatível com a complexidade real</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-crit">Alto</span></td></tr>
+            <tr><td class="num">RP-02</td><td>Disponibilidade de TI ALE limitada por outros projetos SAP</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+            <tr><td class="num">RP-03</td><td>Carga de legado mais complexa que o esperado</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Integração / Dependência</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">ID</th><th>Risco</th><th>Prob.</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr><td class="num">RI-01</td><td>Mudanças na arquitetura/cronograma do novo PCR impactam a Fase 1</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-crit">Alto</span></td></tr>
+            <tr><td class="num">RI-02</td><td>Dependência de sincronismo com o PCR durante a migração do SICOF</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+            <tr><td class="num">RI-03</td><td>Estrutura do guarda-chuva B2B pode divergir no novo PCR</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Negócio &amp; premissas</h3>
+        <div class="twrap"><table>
+          <thead><tr><th class="num">ID</th><th>Risco</th><th>Prob.</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr><td class="num">RN-01</td><td>Pagamento de concessão (fora do escopo) pode ser pedido dentro do MVP</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+            <tr><td class="num">RN-02</td><td>Alta variabilidade das regras contratuais pode alongar a especificação do E2</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+            <tr><td class="num">RN-03</td><td>Sem budget definido, proposta pode ser rejeitada por valor</td><td><span class="chip chip-warn">Média</span></td><td><span class="chip chip-crit">Alto</span></td></tr>
+            <tr><td class="num">RN-04</td><td>Dependência de Igor Oliveira, único detentor do conhecimento operacional das planilhas</td><td><span class="chip chip-crit">Alta</span></td><td><span class="chip chip-warn">Médio</span></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- 13. PENDENCIAS -->
+      <section id="pendencias">
+        <div class="sec-head"><span class="sec-num">13</span><h2 class="sec-title">Pendências abertas</h2></div>
+        <p class="sec-dek">Nada aqui deve ser assumido ou implementado sem confirmação — todas dependem de insumo externo.</p>
+
+        <div class="twrap"><table>
+          <thead><tr><th>Item</th><th>Quem desbloqueia</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr><td>Lista de gatilhos, situações de notificação e variáveis de alerta</td><td>Igor Oliveira</td><td>Bloqueia a nova funcionalidade de gatilhos/alertas</td></tr>
+            <tr><td>Avaliação técnica de gatilhos/alertas e impacto no cronograma</td><td>Yuri Najar</td><td>Confirma se a funcionalidade entra no escopo</td></tr>
+            <tr><td>Modelos de estudo de TIR (Radix + manual) — confirmar linhas do racional</td><td>Suzana Yamada</td><td>Bloqueia o racional auditável da TIR</td></tr>
+            <tr><td>Lista oficial de tipos de ação, status, subáreas e motivos de encerramento (com explicação de cada)</td><td>Thaísa (jurídico ALE)</td><td>Prometida em 07/07, ainda não recebida — bloqueia os enums finais dos DTOs de processo</td></tr>
+            <tr><td>Modelo/campos de uma ação judicial (cadastro e pré-cadastro) e minuta de contrato PCR</td><td>Thaísa (jurídico ALE)</td><td>Prometida em 07/07, ainda não recebida — refina o payload real da integração</td></tr>
+            <tr><td>Documentação técnica formal da API do Elaw</td><td>Time técnico do Elaw (solicitação feita por Lelio Lins)</td><td>Sem isso, todo o mapeamento de campos é uma hipótese de trabalho, não um contrato de API confirmado</td></tr>
+            <tr><td>Origem real dos dados de garantia por fiança (fiadores) — parece estar no SICOF, não no Elaw</td><td>Lelio Lins / Larissa</td><td>Pode exigir uma segunda fonte de integração além do Elaw para o bloco de garantias</td></tr>
+            <tr><td>Decisão sobre botão "ver detalhes" por processo (modal/drawer) — risco de redundância com o Elaw</td><td>André / Thaísa</td><td>Ainda em dúvida, aguardando mais insumo antes de prototipar</td></tr>
+            <tr><td>5 tipos de justificativa das notificações Elaw</td><td>André / Suzana</td><td>Superado em parte — Thaísa confirmou que o campo é texto livre no Elaw hoje (sem lista fixa de 5 tipos)</td></tr>
+            <tr><td>CNPJ pode ter mais de uma PCR ativa simultaneamente?</td><td>A confirmar com cliente</td><td>Define se a listagem migra de PCR para CNPJ</td></tr>
+            <tr><td>Formatos dos relatórios de diretoria e Glencore</td><td>Ana Caldas</td><td>Desbloqueia adaptação do dashboard executivo</td></tr>
+            <tr><td>Sessão de reappraise com Natália Romão</td><td>Suzana (agendamento)</td><td>Especifica a aba de reappraise em detalhe</td></tr>
+            <tr><td>Sessão de PIR com Natália Romão</td><td>Suzana (agendamento)</td><td>Define conteúdo real da aba PIR</td></tr>
+            <tr><td>Regras de classificação do status do reappraise (OK/Recuperação/Crítico)</td><td>Suzana Yamada</td><td>Bloqueia a lógica da tag de status</td></tr>
+            <tr><td>Especificação dos campos de garantia (valor, vencimento, avaliação)</td><td>Fernanda (jurídico ALE)</td><td>Completa o placeholder "ver detalhes"</td></tr>
+            <tr><td>Definição de "inauguração" na operação da ALE</td><td>Cliente</td><td>Afeta F20 — histórico de inaugurações</td></tr>
+            <tr><td>Mecanismo de atualização da bandeira ANP</td><td>A definir</td><td>Integração direta ou entrada manual — afeta E5</td></tr>
+            <tr><td>Rastreamento do investimento original em repactuações/cessões</td><td>Yuri + Natália</td><td>Afeta o cálculo correto da TIR em contratos com histórico</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- 14. GLOSSARIO -->
+      <section id="glossario">
+        <div class="sec-head"><span class="sec-num">14</span><h2 class="sec-title">Glossário</h2></div>
+        <p class="sec-dek">Termos de negócio e de processo mais usados. Lista completa em <code class="mono">[ARTEFATO] GLOSSARIO…md</code>.</p>
+
+        <dl class="gloss">
+          <dt>PCR</dt><dd>Proposta de Concessão de Revenda — aprova um novo contrato com um posto da rede.</dd>
+          <dt>PCF</dt><dd>Equivalente à PCR para contratos B2B (grande volume, sem bandeira).</dd>
+          <dt>PCR 700</dt><dd>Extração de dados de PCRs feita a partir do SICOF, usada como fonte hoje e como fallback de carga.</dd>
+          <dt>Galonagem</dt><dd>Volume de combustível contratado ou comprado. "Cumprir a galonagem" = atingir o volume mínimo acordado.</dd>
+          <dt>Vencido por galonagem</dt><dd>Volume cumprido (100%+) antes do prazo — vencimento positivo, barra verde.</dd>
+          <dt>Vencido por data</dt><dd>Prazo expirou sem cumprir a galonagem — vencimento negativo, barra vermelha, requer ação comercial.</dd>
+          <dt>Contrato guarda-chuva</dt><dd>CNPJ principal + adicionais vinculados. Rede = galonagem individual; B2B = galonagem global.</dd>
+          <dt>Contrato Greenfield</dt><dd>Posto novo com meta de consumo progressiva (curva de maturação) em vez de meta fixa.</dd>
+          <dt>Grupo econômico</dt><dd>Conjunto de CNPJs do mesmo grupo controlador, identificado pelo código SAP do grupo (3 dígitos).</dd>
+          <dt>Reappraise</dt><dd>Análise de performance (volume + margem), resulta em status OK/Recuperação/Crítico.</dd>
+          <dt>TIR</dt><dd>Taxa Interna de Retorno — retorno financeiro do investimento no contrato, via fluxo de caixa completo.</dd>
+          <dt>VPL</dt><dd>Valor Presente Líquido — quanto o contrato gera de valor em reais de hoje.</dd>
+          <dt>PIR</dt><dd>Revisão de Investimento Pós-Realização — compara fluxo de caixa real vs. o aprovado na PCR. Fase futura.</dd>
+          <dt>Sublocação</dt><dd>Revendedor não é dono do imóvel — é locatário de terceiro. Prazo de sublocação limita a negociação.</dd>
+          <dt>Denúncia contratual</dt><dd>Encerramento formal do contrato antes do prazo, geralmente por descumprimento.</dd>
+          <dt>Depuração</dt><dd>Remoção do cliente da gestão comercial ativa → segmento GRR (Rede) ou "Outros" (B2B).</dd>
+          <dt>SICOF</dt><dd>Sistema interno antigo da ALE, sendo substituído pelo SAP — acesso encerra após a migração.</dd>
+          <dt>Módulo satélite</dt><dd>Sistema independente, conectado a um sistema central (SAP), cobrindo o que o central não atende.</dd>
+        </dl>
+      </section>
+
+      <!-- 15. ARQUIVOS -->
+      <section id="arquivos">
+        <div class="sec-head"><span class="sec-num">15</span><h2 class="sec-title">Mapa de arquivos</h2></div>
+
+        <div class="callout callout-open">
+          <span class="lbl">Nota de atualidade — leia antes de citar qualquer documento isoladamente</span>
+          <p>Os artefatos têm datas diferentes e nem todos foram atualizados na mesma velocidade. Do mais antigo ao mais recente: <strong>CONTEXT v3.2</strong> (15/06) → <strong>Handoff</strong> (02/07, já defasado nos pontos tratados em 03/07) → <strong>Feedbacks compilados v2</strong> (atualizado 06/07, cobre até a reunião de 03/07) → <strong>TIR/PIR</strong> (atualizado 14/07, o mais recente). Em caso de conflito entre documentos, este contexto já resolveu a favor da fonte mais recente — mas vale conferir a data ao citar algo específico para o cliente.</p>
+        </div>
+
+        <div class="twrap"><table>
+          <thead><tr><th>Arquivo</th><th>Conteúdo</th><th>Quando consultar</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">CONTEXT…_v3.md</td><td>Proposta comercial, riscos, personas, F01–F21, jornadas, refinamento por funcionalidade</td><td>Referência central de produto/negócio/técnica</td></tr>
+            <tr><td class="mono">GLOSSARIO…md</td><td>Termos de processo, negócio, sistemas e técnicos</td><td>Termo desconhecido</td></tr>
+            <tr><td class="mono">RESUMO…md</td><td>Explicação do projeto em linguagem simples</td><td>Apresentar o projeto a alguém novo</td></tr>
+            <tr><td class="mono">FEEDBACKS COMPILADOS…v2.md</td><td>Feedbacks das 4 rodadas de protótipo (23/06–03/07)</td><td>Antes de iterar no protótipo</td></tr>
+            <tr><td class="mono">MAPEAMENTO ELAW…md</td><td>Todos os campos citados como vindos do Elaw, com citação literal e fonte (versão inicial, pré-walkthrough)</td><td>Especificar a integração jurídica — ver também os 3 arquivos de transcrição e o doc de integração abaixo</td></tr>
+            <tr><td class="mono">[TRANSC] 20260706_Reuniao E_law x Gestao.md</td><td>Validação do protótipo jurídico com o time Elaw (Larissa, Thaísa) — escopo ampliado, regras de garantia e ações</td><td>Entender o "porquê" das decisões de escopo jurídico</td></tr>
+            <tr><td class="mono">[TRANSC] 20260707 Elaw overview.md</td><td>Walkthrough completo do sistema Elaw por Thaísa — campos reais de notificação, processo e contrato</td><td>Fonte primária para especificar a integração — ler antes de qualquer decisão de campo</td></tr>
+            <tr><td class="mono">[TRANSC] 20260707_Alinhamento interno_Overview Elaw.md</td><td>Síntese interna Performa_IT pós-walkthrough, decisões de tela</td><td>Ver o que foi decidido vs. o que ainda depende da Thaísa</td></tr>
+            <tr><td class="mono">Integração Elaw — Dados Jurídicos &amp; Contrato de API (novo)</td><td>Todos os campos jurídicos mapeados, com status de confirmação e DTOs sugeridos para a integração</td><td>Handoff direto para arquitetura (Yuri) especificar o E4</td></tr>
+            <tr><td class="mono">EXPLICACAO_TIR_PIR.md</td><td>Guia de Reappraise, TIR, VPL e PIR — o mais recente</td><td>Especificar E3 / financeiro</td></tr>
+            <tr><td class="mono">HANDOFF…md</td><td>Ponto de entrada para quem ingressa no projeto</td><td>Onboarding — mas cruzar com feedbacks mais recentes</td></tr>
+            <tr><td class="mono">[PROT]…V3-0.html</td><td>Protótipo interativo (Claude Design)</td><td>Ver o estado atual do produto</td></tr>
+            <tr><td class="mono">De-Para…xlsx</td><td>Mapeamento campo a campo, planilhas atuais → sistema novo</td><td>Modelagem de dados (seção 5 acima)</td></tr>
+            <tr><td class="mono">Base Consolidada…ALE (Abr26)…xlsx</td><td>Exemplo da base atual — segmento Rede</td><td>Entender o formato real dos dados de origem</td></tr>
+            <tr><td class="mono">Base contratos COFA_Maio_26…xlsx</td><td>Base atual do segmento B2B</td><td>Idem, para B2B</td></tr>
+            <tr><td class="mono">pcr700_05.06.2026.xlsb</td><td>Extração PCR 700 (via SICOF) — arquivo mais pesado (~4MB)</td><td>Avaliar viabilidade de fallback de carga (RT‑04)</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+    </div>
+
+    <footer>Compilado a partir dos artefatos de <code class="mono">/documentos</code> — PIPREVENDA‑1680 · ALE Combustíveis × Performa_IT · Síntese gerada em 20/07/2026</footer>
+  </main>
+</div>
+
+<script>
+  (function(){
+    var toggle = document.getElementById('tocToggle');
+    var nav = document.getElementById('tocNav');
+    if(toggle){ toggle.addEventListener('click', function(){ nav.classList.toggle('open'); }); }
+
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+    var map = {};
+    links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
+    if('IntersectionObserver' in window && sections.length){
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          var link = map[e.target.id];
+          if(!link) return;
+          if(e.isIntersecting){
+            links.forEach(function(l){ l.classList.remove('active'); });
+            link.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+      sections.forEach(function(s){ obs.observe(s); });
+    }
+  })();
+</script>

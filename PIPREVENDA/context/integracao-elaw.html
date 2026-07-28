@@ -1,0 +1,509 @@
+<title>Integração Elaw — Dados Jurídicos &amp; Contrato de API</title>
+<style>
+  :root{
+    --paper:#F5F6F3; --paper-raised:#FFFFFF; --ink:#171A1C; --ink-soft:#4B5358;
+    --line:#DBDFDA; --accent:#2A5C8A; --accent-soft:#E7EEF3; --accent-ink:#1B4468;
+    --ok:#2F9E5B; --ok-soft:#E3F3E9; --warn:#B8790F; --warn-soft:#FBF0DA;
+    --crit:#C9463C; --crit-soft:#FBE6E3; --mono-bg:#ECEDE9; --mono-ink:#3C4448;
+    --shadow: 0 1px 2px rgba(23,26,28,.06), 0 8px 24px -12px rgba(23,26,28,.18);
+    color-scheme: light;
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181B; --paper-raised:#1B2024; --ink:#E9EBE7; --ink-soft:#9CA6A6;
+    --line:#2B3236; --accent:#7AB0E0; --accent-soft:#1E2A33; --accent-ink:#BFE0FF;
+    --ok:#4CBE7C; --ok-soft:#17301F; --warn:#E0A83B; --warn-soft:#332711;
+    --crit:#E27268; --crit-soft:#331815; --mono-bg:#20262A; --mono-ink:#C7D0D0;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181B; --paper-raised:#1B2024; --ink:#E9EBE7; --ink-soft:#9CA6A6;
+      --line:#2B3236; --accent:#7AB0E0; --accent-soft:#1E2A33; --accent-ink:#BFE0FF;
+      --ok:#4CBE7C; --ok-soft:#17301F; --warn:#E0A83B; --warn-soft:#332711;
+      --crit:#E27268; --crit-soft:#331815; --mono-bg:#20262A; --mono-ink:#C7D0D0;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+      color-scheme: dark;
+    }
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } *{ transition:none !important; animation:none !important; } }
+
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace; }
+  h1,h2,h3,h4{ text-wrap:balance; font-weight:800; letter-spacing:-.01em; margin:0; }
+  p{ margin:0 0 .9em; max-width:70ch; }
+  a{ color:var(--accent); }
+
+  .shell{ display:grid; grid-template-columns:272px minmax(0,1fr); min-height:100vh; }
+  @media (max-width:960px){ .shell{ grid-template-columns:1fr; } }
+  nav.toc{ position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto; padding:28px 18px 40px; border-right:1px solid var(--line); background:var(--paper); }
+  @media (max-width:960px){ nav.toc{ position:relative; height:auto; border-right:none; border-bottom:1px solid var(--line); padding:16px 18px; } }
+  .toc-brand{ display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
+  .toc-mark{ width:10px; height:10px; border-radius:2px; background:var(--accent); flex:none; }
+  .toc-brand b{ font-size:13px; letter-spacing:.04em; text-transform:uppercase; }
+  .toc-sub{ font-size:12px; color:var(--ink-soft); margin-bottom:20px; }
+  nav.toc ol{ list-style:none; margin:0; padding:0; counter-reset:sec; }
+  nav.toc li{ counter-increment:sec; }
+  nav.toc a{ display:flex; gap:8px; align-items:baseline; text-decoration:none; color:var(--ink-soft); font-size:13.5px; padding:6px 8px; border-radius:6px; border-left:2px solid transparent; }
+  nav.toc a::before{ content:counter(sec, decimal-leading-zero); font-family: ui-monospace, monospace; font-size:11px; color:var(--ink-soft); opacity:.6; }
+  nav.toc a:hover{ background:var(--accent-soft); color:var(--ink); }
+  nav.toc a.active{ color:var(--accent-ink); border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+  .toc-foot{ margin-top:22px; padding-top:14px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-soft); }
+  main{ min-width:0; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 32px 120px; }
+  @media (max-width:640px){ .wrap{ padding:0 18px 90px; } }
+
+  header.masthead{ padding:56px 32px 40px; border-bottom:1px solid var(--line); }
+  @media (max-width:640px){ header.masthead{ padding:36px 18px 28px; } }
+  .mh-inner{ max-width:920px; margin:0 auto; }
+  .eyebrow{ font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-ink); font-weight:700; margin-bottom:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .eyebrow .mono{ background:var(--mono-bg); color:var(--mono-ink); padding:2px 7px; border-radius:4px; letter-spacing:0; font-weight:600; font-size:11.5px; }
+  h1.title{ font-size:clamp(28px,4.6vw,42px); line-height:1.05; margin-bottom:14px; }
+  .subtitle{ font-size:18px; color:var(--ink-soft); max-width:64ch; margin-bottom:22px; }
+  .mh-facts{ display:flex; flex-wrap:wrap; gap:10px 28px; font-size:13.5px; }
+  .mh-facts div{ display:flex; flex-direction:column; gap:2px; }
+  .mh-facts .k{ text-transform:uppercase; letter-spacing:.06em; font-size:11px; color:var(--ink-soft); }
+  .mh-facts .v{ font-weight:650; }
+
+  section{ padding:52px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  .sec-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:22px; }
+  .sec-num{ font-family: ui-monospace, monospace; font-size:13px; color:var(--accent); font-weight:700; }
+  h2.sec-title{ font-size:25px; }
+  .sec-dek{ color:var(--ink-soft); margin:-10px 0 26px; font-size:15px; }
+  h3{ font-size:18px; margin:30px 0 10px; }
+  h4{ font-size:14.5px; margin:20px 0 8px; color:var(--ink); }
+
+  .grid{ display:grid; gap:14px; }
+  .grid-2{ grid-template-columns:1fr 1fr; }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  @media (max-width:720px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+  .card{ background:var(--paper-raised); border:1px solid var(--line); border-radius:10px; padding:16px 18px; box-shadow:var(--shadow); }
+  .card h4{ margin-top:0; } .card p:last-child{ margin-bottom:0; }
+
+  .twrap{ overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); box-shadow:var(--shadow); }
+  table{ border-collapse:collapse; width:100%; font-size:13.5px; min-width:560px; }
+  thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); padding:10px 14px; border-bottom:1px solid var(--line); white-space:nowrap; position:sticky; top:0; background:var(--paper-raised); }
+  tbody td{ padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--accent-soft); }
+  td.field{ font-family:ui-monospace,monospace; font-size:12.5px; color:var(--mono-ink); white-space:nowrap; }
+
+  .chip{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px; white-space:nowrap; letter-spacing:.01em; }
+  .chip-ok{ background:var(--ok-soft); color:var(--ok); }
+  .chip-warn{ background:var(--warn-soft); color:var(--warn); }
+  .chip-crit{ background:var(--crit-soft); color:var(--crit); }
+  .chip-mono{ background:var(--mono-bg); color:var(--mono-ink); font-family:ui-monospace,monospace; }
+  .chip-accent{ background:var(--accent-soft); color:var(--accent-ink); }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; padding:12px 16px; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); font-size:13px; margin-bottom:22px; }
+  .legend b{ font-weight:700; }
+
+  .callout{ border-radius:10px; padding:14px 16px; border:1px solid var(--line); margin:16px 0; font-size:14.5px; }
+  .callout p:last-child{ margin-bottom:0; }
+  .callout-locked{ background:var(--ok-soft); border-color:color-mix(in srgb, var(--ok) 35%, var(--line)); }
+  .callout-open{ background:var(--warn-soft); border-color:color-mix(in srgb, var(--warn) 35%, var(--line)); }
+  .callout-risk{ background:var(--crit-soft); border-color:color-mix(in srgb, var(--crit) 35%, var(--line)); }
+  .callout-note{ background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 35%, var(--line)); }
+  .callout .lbl{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; font-weight:800; margin-bottom:6px; }
+  .callout-locked .lbl{ color:var(--ok); } .callout-open .lbl{ color:var(--warn); }
+  .callout-risk .lbl{ color:var(--crit); } .callout-note .lbl{ color:var(--accent-ink); }
+
+  .tl{ position:relative; margin-left:8px; padding-left:26px; border-left:2px solid var(--line); }
+  .tl-item{ position:relative; padding-bottom:26px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{ content:""; position:absolute; left:-33px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid var(--paper); box-shadow:0 0 0 2px var(--accent); }
+  .tl-title{ font-weight:700; margin-bottom:4px; font-size:14.5px; }
+  .tl-item p{ font-size:14px; margin-bottom:0; color:var(--ink-soft); }
+
+  pre{ margin:14px 0; padding:16px 18px; border-radius:10px; background:var(--mono-bg); color:var(--mono-ink); overflow-x:auto; border:1px solid var(--line); box-shadow:var(--shadow); }
+  code{ font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace; font-size:12.8px; line-height:1.65; }
+  .cm{ opacity:.6; } /* comment styling inline, applied via span in code text isn't parsed, kept simple */
+
+  dl.gloss dt{ font-weight:700; margin-top:14px; font-family:ui-monospace,monospace; font-size:13.5px; }
+  dl.gloss dt:first-child{ margin-top:0; }
+  dl.gloss dd{ margin:2px 0 0; color:var(--ink-soft); font-size:14px; }
+
+  footer{ padding:40px 32px 60px; text-align:center; color:var(--ink-soft); font-size:12.5px; }
+
+  #tocToggle{ display:none; }
+  @media (max-width:960px){
+    .toc-list{ display:none; }
+    #tocToggle{ display:block; width:100%; text-align:left; background:var(--paper-raised); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-weight:700; font-size:13px; color:var(--ink); margin-top:8px; }
+    nav.toc.open .toc-list{ display:block; margin-top:14px; }
+  }
+</style>
+
+<div class="shell">
+  <nav class="toc" id="tocNav">
+    <div class="toc-brand"><span class="toc-mark"></span><b>Elaw · Integração</b></div>
+    <div class="toc-sub">PIPREVENDA‑1680 — módulo jurídico (E4)</div>
+    <button id="tocToggle">Sumário ▾</button>
+    <div class="toc-list">
+      <ol>
+        <li><a href="#escopo">Escopo &amp; objetivo</a></li>
+        <li><a href="#chave">Chave de integração</a></li>
+        <li><a href="#ciclo">Ciclo de vida jurídico</a></li>
+        <li><a href="#notificacoes">Notificações</a></li>
+        <li><a href="#processos">Processos / ações</a></li>
+        <li><a href="#garantias">Garantias &amp; sublocação</a></li>
+        <li><a href="#contrato">Contrato (repositório)</a></li>
+        <li><a href="#objetos">Objetos sugeridos (DTOs)</a></li>
+        <li><a href="#fora">Fora do escopo / decisões pendentes</a></li>
+        <li><a href="#pendencias">Pendências &amp; próximos passos</a></li>
+        <li><a href="#glossario">Glossário Elaw</a></li>
+      </ol>
+    </div>
+    <div class="toc-foot">Fonte: 3 transcrições de reunião (06–07/07/2026) + Mapeamento Elaw original. Companion do <a href="#" onclick="return false;">Contexto Geral do Projeto</a>.</div>
+  </nav>
+
+  <main>
+    <header class="masthead">
+      <div class="mh-inner">
+        <div class="eyebrow"><span class="mono">PIPREVENDA-1680</span><span>Entregável E4 — Módulo Jurídico</span></div>
+        <h1 class="title">Integração Elaw — Dados Jurídicos &amp; Contrato de API</h1>
+        <p class="subtitle">Mapeamento de todos os campos jurídicos citados nas reuniões com o time Elaw da ALE, com status de confirmação e uma proposta de objetos de transporte para a integração. Documento de trabalho para a arquitetura (Yuri Najar) — não é um contrato de API fechado, porque a documentação técnica formal do Elaw ainda não foi recebida.</p>
+        <div class="mh-facts">
+          <div><span class="k">Fontes</span><span class="v">3 transcrições, 06–07/07/2026</span></div>
+          <div><span class="k">Sistema de origem</span><span class="v">Elaw (citado também como "ILO" / "Willow" nas gravações)</span></div>
+          <div><span class="k">Entregável</span><span class="v">E4 · F15 · F16</span></div>
+          <div><span class="k">Status da API</span><span class="v">Documentação técnica solicitada, não recebida</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+
+      <section id="escopo">
+        <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">Escopo &amp; objetivo</h2></div>
+        <p>A intenção validada com o próprio time jurídico (reunião 07/07) é mostrar, na aba Jurídico do sistema de gestão de contratos, uma <strong>prévia / resumo</strong> do que existe no Elaw — não recriar a tela do Elaw. Citação direta: <em>"a nossa intenção é mostrar lá no gestão de contratos uma prévia do que existe no Elaw (...) a intenção não é refazer a tela do Elaw."</em></p>
+        <div class="callout callout-note">
+          <span class="lbl">Consequência para o design da API</span>
+          <p>Isso significa que o contrato de integração deve priorizar campos de <strong>identificação, status e resumo</strong> — não o detalhamento completo de cada processo (tramitação completa, comunicações judiciais, anexos). Para aprofundar, a ideia (ainda não decidida) é um link que direcione o usuário ao Elaw, condicionado a quem tem acesso direto ao sistema.</p>
+        </div>
+        <p>Todo registro no Elaw — contrato, notificação ou processo — gera um <span class="field-inline mono">ID</span> único e individual no momento da criação. Esse ID é o identificador técnico primário para cada entidade abaixo.</p>
+      </section>
+
+      <section id="chave">
+        <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Chave de integração &amp; riscos de dados</h2></div>
+        <p>A busca no Elaw aceita: <strong>ID</strong> do registro, <strong>partes envolvidas</strong>, <strong>nome do posto</strong>, <strong>CNPJ</strong>, <strong>número de contrato</strong>, <strong>número da PCR</strong> ou <strong>solicitante</strong>. Para a integração, <strong>CNPJ</strong> é a chave natural — mas com três riscos de dados relatados pelo próprio time do Elaw:</p>
+        <div class="grid grid-3">
+          <div class="card"><h4>Grupos econômicos multi-CNPJ</h4><p>Um grupo pode ter dezenas de razões sociais cadastradas sob uma única "parte principal" no Elaw. Caso relatado: grupo com 32 razões sociais — um relatório padrão só retornou 1 CNPJ, mesmo as 31 restantes estando na mesma ação.</p></div>
+          <div class="card"><h4>CNPJ ausente ou fora de padrão</h4><p>Legado pré-migração do sistema anterior ao Elaw tinha registros sem CNPJ ou fora de padrão. Já revisado em bloco pela ALE, mas pode restar resíduo. Cadastros novos têm CNPJ obrigatório.</p></div>
+          <div class="card"><h4>Sócio pessoa física no polo passivo</h4><p>Quando uma PJ é encerrada, a ação pode ser movida contra o sócio responsável (pessoa física) — nesses casos o CNPJ da PJ original pode não recuperar o processo sozinho.</p></div>
+        </div>
+        <div class="callout callout-open">
+          <span class="lbl">Mitigação sugerida, ainda não validada tecnicamente</span>
+          <p>Buscar por CNPJ <strong>e</strong> pelo campo "Grupo" (quando disponível) e prever um campo de fallback para o CNPJ da "parte principal" do grupo. Precisa de validação com o time do Elaw quando a documentação de API chegar.</p>
+        </div>
+      </section>
+
+      <section id="ciclo">
+        <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Ciclo de vida jurídico</h2></div>
+        <p class="sec-dek">Do primeiro aviso ao revendedor até o encerramento do processo. Entender esse fluxo é pré-requisito para desenhar os DTOs — cada etapa muda o conjunto de campos disponível.</p>
+        <div class="tl">
+          <div class="tl-item"><div class="tl-title">1 · Notificação Grau 1 — tom amigável</div><p>"Vamos tentar resolver amigavelmente." Prazo padrão de resolução: 15 dias (configurável por caso).</p></div>
+          <div class="tl-item"><div class="tl-title">2 · Notificação Grau 2 — tom mais firme</div><p>Mesmo fluxo de envio (escritório de advocacia parceiro → telegrama → confirmação via AR pelos Correios), tom mais agressivo.</p></div>
+          <div class="tl-item"><div class="tl-title">3 · Notificação Grau 3 — aviso formal de judicialização</div><p>Comunica que, sem resolução, a ação será protocolada. Tecnicamente já roda dentro do fluxo de contratos/judicialização do Elaw (não do módulo simples de notificação), porque reaproveita os mesmos documentos (lista de equipamentos, NFs) exigidos depois para a ação.</p></div>
+          <div class="tl-item"><div class="tl-title">4 · 15 dias sem resolução → Pré-cadastro</div><p><strong>Transição manual hoje</strong> — controlada por planilha da equipe jurídica, não automática no Elaw. Pré-cadastro já tem ID de processo, mas ainda não tem número de processo judicial oficial.</p></div>
+          <div class="tl-item"><div class="tl-title">5 · Análise de viabilidade (escritório parceiro)</div><p>O caso pode ser encerrado <em>aqui</em>, antes de virar ação ativa, se o escritório considerar inviável prosseguir (ex.: contrato muito antigo, sem chance de retorno).</p></div>
+          <div class="tl-item"><div class="tl-title">6 · Ativo</div><p>Citação protocolada, processo em andamento de fato. Ganha campos adicionais (área geradora, tipo de ação, valor da causa, classificação, fase) que não existiam no pré-cadastro — os campos do pré-cadastro não são substituídos, apenas complementados.</p></div>
+          <div class="tl-item"><div class="tl-title">7 · Encerrado</div><p>Por acordo, decisão judicial, renovação do contrato (PCR nova engloba o caso) ou inviabilidade constatada. Sempre com motivo (lista) + observação (texto livre) + parecer do escritório.</p></div>
+        </div>
+        <div class="callout callout-risk">
+          <span class="lbl">Não assumir automação</span>
+          <p>Os passos 3→4 (grau 3 → pré-cadastro) e o disparo da ação judicial em si <strong>não são automáticos</strong> no Elaw hoje — dependem de controle manual da equipe. O sistema de gestão de contratos deve consumir o <em>resultado</em> (status atual), não tentar inferir essa transição por conta própria.</p>
+        </div>
+      </section>
+
+      <section id="notificacoes">
+        <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">Domínio: Notificações</h2></div>
+        <div class="legend"><span class="chip chip-ok">Confirmado — Lelio/Thaísa validaram que a API consegue entregar</span><span class="chip chip-warn">Parcial / a confirmar</span><span class="chip chip-crit">Não disponível via API — manual ou inexistente</span></div>
+        <div class="twrap"><table>
+          <thead><tr><th>Campo</th><th>Descrição</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="field">id</td><td>Identificador único da notificação no Elaw</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">cnpjRevendedor</td><td>CNPJ do posto/revendedor notificado</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">grau</td><td>Nível da notificação: 1 (amigável), 2 (firme), 3 (aviso de judicialização)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">status</td><td>Pendente (aguardando AR) ou Finalizado</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">dataSolicitacao</td><td>Data em que a notificação foi solicitada</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">justificativa</td><td>Motivo da notificação — hoje campo de texto livre no Elaw (ex.: "ANP", "compresa menor", "despejo"). Elaw está unificando este campo com o antigo "motivo"</td><td><span class="chip chip-ok">Confirmado (texto livre, sem lista fixa)</span></td></tr>
+            <tr><td class="field">solicitante</td><td>Pessoa/área que solicitou a notificação (ex.: Igor)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">prazoResolucaoDias</td><td>Prazo dado ao revendedor para resolver (padrão 15, mas customizável por caso: já houve 5 e 10 dias)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">dataConfirmacaoRecebimento</td><td>Data em que o AR (Aviso de Recebimento dos Correios) confirmou a entrega</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">numeroTelegrama</td><td>Identificador do telegrama enviado ao posto</td><td><span class="chip chip-warn">Disponível na tela, confirmar exposição via API</span></td></tr>
+            <tr><td class="field">processosOrigemIds</td><td>Lista de IDs de processos/ações originados por esta notificação (uma notificação grau 3 pode originar mais de um processo)</td><td><span class="chip chip-warn">Relação confirmada em discussão, campo de API a confirmar</span></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="processos">
+        <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">Domínio: Processos / Ações (Contencioso)</h2></div>
+        <p>Um mesmo revendedor — e até uma mesma PCR — pode ter <strong>múltiplos processos simultâneos</strong>, cada um com ID próprio (ex.: uma PCR com contrato PCVM, contrato de multa e contrato de compra/venda de equipamentos pode gerar processos separados para cada um).</p>
+        <div class="twrap"><table>
+          <thead><tr><th>Campo</th><th>Descrição</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="field">id</td><td>ID do processo/ação no Elaw (distinto do número de processo judicial oficial)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">numeroProcessoJudicial</td><td>Número oficial do processo — só existe a partir do status Ativo, ausente em Pré-cadastro</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">cnpjRevendedor</td><td>CNPJ da parte (empresa) envolvida</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">tipoAcao</td><td>Nome/título da ação (ex.: "Realinhamento de rede" = rescisão de PCVM/Imagem)</td><td><span class="chip chip-warn">Confirmado que existe — lista oficial prometida por Thaísa, não recebida</span></td></tr>
+            <tr><td class="field">subarea</td><td>Classificação interna ("objeto principal da ação"): Realinhamento de rede, Recuperação de crédito, Meu Estante/BDV (reintegração de posse de equipamentos), Real Estate (garantia imóvel), Alienação</td><td><span class="chip chip-warn">Lista oficial prometida, não recebida</span></td></tr>
+            <tr><td class="field">status</td><td>Ativo · Encerrado · Pré-cadastro · Suspenso · Removido (só os 3 primeiros usados na prática hoje pela ALE — mas os 5 existem no sistema)</td><td><span class="chip chip-ok">Confirmado — 5 valores possíveis</span></td></tr>
+            <tr><td class="field">fase</td><td>Onde o processo está: acordo, aguardando arquivamento, aguardando citação, busca de bens, recursal, execução</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">areaGeradora</td><td>Área interna da ALE responsável pela origem do caso (comercial, RH, etc.) — só existe quando status = Ativo</td><td><span class="chip chip-ok">Confirmado, condicional ao status</span></td></tr>
+            <tr><td class="field">valorCausa</td><td>Valor da causa</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">classificacaoRisco</td><td>Classificação do processo (ex.: baixa por perda estratégica, baixa normal)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">custasJudiciais</td><td>Total gasto em custas judiciais do processo</td><td><span class="chip chip-ok">Confirmado — extraível</span></td></tr>
+            <tr><td class="field">honorarios</td><td>Valor de honorários</td><td><span class="chip chip-warn">Parcial — varia conforme a fase do processo, precisa cálculo "por fora"</span></td></tr>
+            <tr><td class="field">sucumbencia</td><td>Valor de sucumbência fixado pelo juízo</td><td><span class="chip chip-crit">Não controlado pela ALE — depende de decisão judicial, não disponibilizar como campo de API confiável</span></td></tr>
+            <tr><td class="field">prognosticoExito</td><td>Prognóstico de êxito da ação</td><td><span class="chip chip-crit">Não existe hoje para processos em que a ALE é ré (polo passivo) — pedido de Suzana não pode ser atendido via API automática</span></td></tr>
+            <tr><td class="field">advogadoResponsavel</td><td>Advogado responsável pelo caso</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">escritorioResponsavel</td><td>Escritório de advocacia parceiro responsável</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">resumoCaso</td><td>Texto-resumo do caso (campo livre no Elaw)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">motivoEncerramento</td><td>Motivo do encerramento — campo de lista no Elaw</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">observacaoEncerramento</td><td>Observação livre associada ao encerramento</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">notificacaoOrigemId</td><td>ID da notificação (grau 3) que originou este processo, quando aplicável</td><td><span class="chip chip-warn">Relação confirmada conceitualmente, campo de API a confirmar</span></td></tr>
+            <tr><td class="field">comunicacoes[]</td><td>Histórico de comunicações judiciais (integração automática via Diário de Justiça Eletrônico)</td><td><span class="chip chip-warn">Existe no Elaw — decidir se entra no MVP (ver seção 9)</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout callout-locked">
+          <span class="lbl">Decisão já validada com o time jurídico (06/07)</span>
+          <p>O escopo não fica restrito a ações de rescisão. Deve trazer <strong>todas as ações ativas do CNPJ</strong>: rescisão contratual, recuperação de crédito (cobrança), reintegração de posse de equipamentos, execuções sobre garantia real (real estate) — inclusive ações em que o <strong>revendedor é quem processa a ALE</strong>. Renomear o container de "Ações de rescisão" para <strong>"Ações ativas no Elaw"</strong>.</p>
+        </div>
+      </section>
+
+      <section id="garantias">
+        <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">Domínio: Garantias &amp; Sublocação</h2></div>
+        <h3>Garantias</h3>
+        <div class="twrap"><table>
+          <thead><tr><th>Campo</th><th>Descrição</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="field">possuiGarantia</td><td>Indicador sim/não</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">tipoGarantia</td><td>Alienação, Hipoteca, Garantia real, Fiança</td><td><span class="chip chip-ok">Lista confirmada por Larissa (jurídico ALE)</span></td></tr>
+            <tr><td class="field">fiadores[]</td><td>Nome dos fiadores, quando o tipo é Fiança</td><td><span class="chip chip-crit">Fonte não é o Elaw — dados de fiança estão concentrados no SICOF</span></td></tr>
+            <tr><td class="field">dataUltimaAvaliacao</td><td>Data da última avaliação/atualização da garantia</td><td><span class="chip chip-warn">Pedido feito, detalhamento pendente com Fernanda (jurídico)</span></td></tr>
+            <tr><td class="field">prazoVigencia</td><td>Prazo de vigência da garantia</td><td><span class="chip chip-warn">Pedido feito, detalhamento pendente</span></td></tr>
+            <tr><td class="field">cnpjsVinculados[]</td><td>Outros CNPJs cobertos pela mesma garantia</td><td><span class="chip chip-warn">Pedido feito, detalhamento pendente</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout callout-risk">
+          <span class="lbl">Risco de arquitetura: duas fontes, não uma</span>
+          <p>O bloco de garantias pode não vir inteiramente do Elaw. Fiança/fiadores foram descritos como concentrados no <strong>SICOF</strong> — que está sendo desativado. É preciso decidir, com Lelio Lins, se esse dado migra para o Elaw antes do go-live ou se o sistema de gestão de contratos precisa de uma segunda integração (ou carga avulsa) só para isso.</p>
+        </div>
+
+        <h3>Sublocação</h3>
+        <div class="twrap"><table>
+          <thead><tr><th>Campo</th><th>Descrição</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="field">possuiSublocacao</td><td>Indicador sim/não (~50 postos afetados, conforme feedback de protótipo)</td><td><span class="chip chip-warn">Dado em processo de carga em lote pelo time Elaw — pode estar incompleto</span></td></tr>
+            <tr><td class="field">prazoVigenciaSublocacao</td><td>Prazo do contrato de sublocação</td><td><span class="chip chip-warn">Idem — dados legados podem não ter sido migrados</span></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="contrato">
+        <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title">Domínio: Contrato (repositório Elaw)</h2></div>
+        <p>Fora do fluxo jurídico, o Elaw também funciona como <strong>repositório do documento de contrato</strong> vinculado à PCR/PCF, com fluxo de assinatura via DocuSign. Todo contrato de revendedor tem um ID no Elaw desde 2020 — mesmo sem nenhuma pendência jurídica. Contratos anteriores a 2020 foram migrados em lote e podem ter furos.</p>
+        <div class="twrap"><table>
+          <thead><tr><th>Campo</th><th>Descrição</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="field">id</td><td>ID do contrato no Elaw</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">numeroPcrPcf</td><td>Vínculo com a PCR/PCF — uma PCR pode ter múltiplos contratos (ex.: PCVM, multa, compra/venda de equipamentos)</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">tipoContrato</td><td>PCVM, Imagem, Multa, Compra e Venda de Equipamentos, etc.</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">dataFim</td><td>Data fim do contrato</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">dataAssinatura</td><td>Data de assinatura, capturada via integração DocuSign</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+            <tr><td class="field">certificadoAssinatura</td><td>Certificado/comprovante de quem assinou e quando</td><td><span class="chip chip-ok">Confirmado</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="callout callout-note">
+          <span class="lbl">Uso mais provável no produto</span>
+          <p>Este domínio serve principalmente para confirmar a <strong>existência do ID do contrato no Elaw</strong> na tela de detalhe (F01) — não necessariamente para exibir o documento em si. Baixa prioridade frente aos domínios jurídicos e de notificação.</p>
+        </div>
+      </section>
+
+      <section id="objetos">
+        <div class="sec-head"><span class="sec-num">08</span><h2 class="sec-title">Objetos sugeridos para transporte (DTOs)</h2></div>
+        <p class="sec-dek">Nomenclatura proposta: prefixo <code class="mono">Elaw</code> para as entidades cruas recebidas da API (payload de integração) e um objeto agregado <code class="mono">ResumoJuridicoContrato</code> — o view-model consumido pela aba Jurídico do produto, que é onde a decisão de "prévia, não espelho" (seção 1) se concretiza. Tipagem em estilo TypeScript por ser a notação mais legível para especificação; adaptar à stack real da integração.</p>
+
+        <h4>Entidades cruas (payload de integração)</h4>
+        <pre><code>interface ElawNotificacao {
+  id: string;                          // chave primária Elaw
+  cnpjRevendedor: string;
+  numeroPcrPcf?: string;
+  grau: 1 | 2 | 3;
+  status: "PENDENTE" | "FINALIZADO";
+  dataSolicitacao: string;             // ISO date
+  justificativa: string;               // texto livre no Elaw
+  solicitante: string;
+  prazoResolucaoDias: number;          // padrão 15, pode variar
+  dataConfirmacaoRecebimento?: string; // via AR dos Correios
+  numeroTelegrama?: string;
+  processosOrigemIds?: string[];       // 1 notificação grau 3 pode gerar N processos
+}
+
+interface ElawProcessoJuridico {
+  id: string;                          // ID Elaw do processo/pasta
+  numeroProcessoJudicial?: string;     // só existe a partir de status ATIVO
+  cnpjRevendedor: string;
+  numeroPcrPcf?: string;
+  tipoAcao?: string;                   // enum a confirmar com Thaísa
+  subarea?: string;                    // enum a confirmar com Thaísa
+  status: "PRE_CADASTRO" | "ATIVO" | "SUSPENSO" | "ENCERRADO" | "REMOVIDO";
+  fase?: string;
+  areaGeradora?: string;               // só populado quando status = ATIVO
+  valorCausa?: number;
+  classificacaoRisco?: string;
+  custasJudiciais?: number;
+  honorarios?: number;                 // parcial — depende da fase
+  advogadoResponsavel?: string;
+  escritorioResponsavel?: string;
+  resumoCaso?: string;
+  motivoEncerramento?: string;
+  observacaoEncerramento?: string;
+  notificacaoOrigemId?: string;
+  dataAbertura: string;
+  dataEncerramento?: string;
+  ultimaAtualizacao: string;
+  // NAO INCLUIR: prognosticoExito, sucumbencia — ver secao 9
+}
+
+interface ElawGarantia {
+  cnpjRevendedor: string;
+  possuiGarantia: boolean;
+  tipoGarantia?: "ALIENACAO" | "HIPOTECA" | "GARANTIA_REAL" | "FIANCA";
+  fiadores?: string[];                 // fonte provavel: SICOF, nao Elaw
+  dataUltimaAvaliacao?: string;
+  prazoVigencia?: string;
+  cnpjsVinculados?: string[];
+  fonte: "ELAW" | "SICOF" | "A_DEFINIR";
+}
+
+interface ElawSublocacao {
+  cnpjRevendedor: string;
+  possuiSublocacao: boolean;
+  prazoVigenciaSublocacao?: string;
+  confiabilidade: "CARGA_EM_ANDAMENTO"; // sinalizar dado como potencialmente incompleto
+}
+
+interface ElawContratoRepositorio {
+  id: string;
+  numeroPcrPcf: string;
+  tipoContrato: string;
+  dataFim: string;
+  dataAssinatura?: string;
+  certificadoAssinatura?: string;
+}</code></pre>
+
+        <h4>View-model consumido pelo produto (aba Jurídico)</h4>
+        <pre><code>interface ResumoJuridicoContrato {
+  cnpjRevendedor: string;
+  numeroPcrPcf: string;
+
+  // cabecalho / cards de resumo (F15)
+  qtdAcoesAtivas: number;
+  qtdNotificacoesEnviadas: number;
+  dataUltimaNotificacao?: string;
+  possuiGarantia: boolean;
+
+  // listagem "Acoes ativas no Elaw" (renomeado, escopo ampliado 06/07)
+  acoes: ElawProcessoJuridico[];
+
+  // container "Notificacoes"
+  notificacoes: ElawNotificacao[];
+
+  // link de aprofundamento — decisao ainda aberta (secao 9)
+  linkElaw?: string;
+}</code></pre>
+
+        <div class="callout callout-locked">
+          <span class="lbl">Por que separar entidade crua de view-model</span>
+          <p>O produto se comprometeu a mostrar uma <em>prévia</em>, não a tela inteira do Elaw. Separar <code class="mono">Elaw*</code> (o que a API entrega) de <code class="mono">ResumoJuridicoContrato</code> (o que a tela exibe) evita que decisões futuras de UX — esconder um campo, agregar dois em um — virem mudanças de contrato de API. A camada de agregação pode evoluir sem tocar na integração.</p>
+        </div>
+      </section>
+
+      <section id="fora">
+        <div class="sec-head"><span class="sec-num">09</span><h2 class="sec-title">Fora do escopo / decisões pendentes de UX</h2></div>
+        <div class="grid grid-2">
+          <div class="card"><h4>Prognóstico de êxito</h4><p>Pedido por Suzana, mas Larissa confirmou que o Elaw não estrutura esse dado para processos em que a ALE é ré. Não modelar como campo de API — se necessário no futuro, seria um dado gerado <em>fora</em> do Elaw, sob demanda.</p></div>
+          <div class="card"><h4>Sucumbência</h4><p>Fixada pelo juízo, fora do controle da ALE. Não tratar como dado confiável de integração contínua.</p></div>
+          <div class="card"><h4>Comunicações judiciais (DJE)</h4><p>Histórico completo de movimentações processuais existe no Elaw, mas é volume alto e de baixo valor para o usuário de negócio (jurídico já acompanha isso diretamente no Elaw). Candidato a ficar fora do MVP.</p></div>
+          <div class="card"><h4>Botão "ver detalhes" por processo</h4><p>Ideia de abrir um modal/drawer com todos os campos que Thaísa mostrou no walkthrough. Ainda em dúvida — risco de redundância com o próprio Elaw. Decisão adiada até receber mais insumo da Thaísa.</p></div>
+        </div>
+        <div class="callout callout-open">
+          <span class="lbl">Ideia em aberto — deep-link para o Elaw</span>
+          <p>Em vez de replicar detalhe, um link no produto que abra o registro correspondente direto no Elaw. Bloqueado por uma pergunta de acesso: nem todo usuário da gestão de contratos necessariamente tem login no Elaw. Encaminhamento provisório discutido: se o usuário não tiver acesso, o link ao menos já direciona qual pessoa acionar (ex.: Fernanda).</p>
+        </div>
+      </section>
+
+      <section id="pendencias">
+        <div class="sec-head"><span class="sec-num">10</span><h2 class="sec-title">Pendências &amp; próximos passos</h2></div>
+        <div class="twrap"><table>
+          <thead><tr><th>Item</th><th>Responsável</th><th>Bloqueia</th></tr></thead>
+          <tbody>
+            <tr><td>Documentação técnica formal da API do Elaw</td><td>Time técnico do Elaw (solicitado por Lelio Lins)</td><td>Todo este documento é hipótese de trabalho até isso chegar</td></tr>
+            <tr><td>Lista oficial de tipos de ação + explicação de cada uma</td><td>Thaísa</td><td>Enum <span class="field-inline mono">tipoAcao</span></td></tr>
+            <tr><td>Lista oficial de subáreas</td><td>Thaísa</td><td>Enum <span class="field-inline mono">subarea</span></td></tr>
+            <tr><td>Lista oficial de status e motivos de encerramento</td><td>Thaísa</td><td>Enums <span class="field-inline mono">status</span> / <span class="field-inline mono">motivoEncerramento</span></td></tr>
+            <tr><td>Modelo/campos de cadastro e pré-cadastro de uma ação judicial</td><td>Thaísa</td><td>Validação fina do DTO <code class="mono">ElawProcessoJuridico</code></td></tr>
+            <tr><td>Minuta de contrato PCR (modelo, sem dados reais)</td><td>Time PCR (via Thaísa)</td><td>Contexto para o domínio "Contrato"</td></tr>
+            <tr><td>Detalhamento dos campos de garantia (avaliação, prazo, CNPJs vinculados)</td><td>Fernanda (jurídico ALE)</td><td>Placeholder "ver detalhes" da garantia no protótipo</td></tr>
+            <tr><td>Confirmar fonte real dos dados de fiança/fiadores (Elaw vs. SICOF)</td><td>Lelio Lins</td><td>Decisão de arquitetura: uma integração ou duas para o bloco de garantias</td></tr>
+            <tr><td>Mecanismo de extração do status de denúncia contratual (cadastrado como "contra-notificação")</td><td>Lelio Lins / Thaísa</td><td>Campo <span class="field-inline mono">statusDenunciaContratual</span>, ainda não modelado aqui por falta de detalhe</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="glossario">
+        <div class="sec-head"><span class="sec-num">11</span><h2 class="sec-title">Glossário Elaw</h2></div>
+        <dl class="gloss">
+          <dt>Elaw / ILO / Willow</dt><dd>Mesmo sistema jurídico da ALE — grafias fonéticas diferentes nas transcrições. Padronizado como "Elaw" nos documentos do projeto.</dd>
+          <dt>AR</dt><dd>Aviso de Recebimento — comprovante digital dos Correios confirmando que o revendedor recebeu a notificação (telegrama), com data de entrega e destinatário.</dd>
+          <dt>GED</dt><dd>Aba de arquivos/documentos anexados dentro de um registro do Elaw (ex.: comprovante de envio da notificação).</dd>
+          <dt>Pré-cadastro</dt><dd>Status de uma ação antes de virar processo ativo — criado (manualmente) 15 dias após notificação grau 3 sem resolução, enquanto o escritório parceiro avalia viabilidade.</dd>
+          <dt>Baixa provisória</dt><dd>Status intermediário: processo nem encerrado, nem ativo — "pausado". Exige justificativa e aprovação da coordenadora (Larissa).</dd>
+          <dt>MRR</dt><dd>Campo/flag interno do Elaw que, quando preenchido, indica que o fluxo de judicialização foi iniciado dentro do contrato.</dd>
+          <dt>Meu Estante / BDV</dt><dd>Subárea relacionada a Bens Destinados à Venda — ações de reintegração de posse de equipamentos.</dd>
+          <dt>Real Estate</dt><dd>Subárea usada quando a garantia executada é o imóvel do posto.</dd>
+          <dt>Realinhamento de rede</dt><dd>Nome interno da ALE para ações de rescisão contratual (PCVM/Imagem).</dd>
+          <dt>DJE</dt><dd>Diário de Justiça Eletrônico — origem das comunicações judiciais que chegam automaticamente ao Elaw.</dd>
+          <dt>Subárea</dt><dd>Classificação interna da ação (equivalente a "objeto principal da ação") — usada para diferenciar tipos de processo dentro da área cível.</dd>
+          <dt>Chancela jurídica</dt><dd>Aprovação formal do jurídico sobre um contrato, etapa que antecede o envio para assinatura via DocuSign.</dd>
+        </dl>
+      </section>
+
+    </div>
+    <footer>Companion do Contexto Geral — PIPREVENDA‑1680 · ALE Combustíveis × Performa_IT · Fonte: transcrições de 06–07/07/2026 · Síntese gerada em 20/07/2026</footer>
+  </main>
+</div>
+
+<script>
+  (function(){
+    var toggle = document.getElementById('tocToggle');
+    var nav = document.getElementById('tocNav');
+    if(toggle){ toggle.addEventListener('click', function(){ nav.classList.toggle('open'); }); }
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+    var map = {};
+    links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
+    if('IntersectionObserver' in window && sections.length){
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          var link = map[e.target.id];
+          if(!link) return;
+          if(e.isIntersecting){
+            links.forEach(function(l){ l.classList.remove('active'); });
+            link.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+      sections.forEach(function(s){ obs.observe(s); });
+    }
+  })();
+</script>
