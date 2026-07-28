@@ -19,12 +19,12 @@ public static class ResultExtensions
         int statusCode = StatusCodes.Status400BadRequest,
         string? type = null)
     {
-        var errorType = type ?? GetErrorType(statusCode);
+        string errorType = type ?? GetErrorType(statusCode);
 
         return Results.Problem(
             statusCode: statusCode,
             title: GetTitle(statusCode),
-            detail: result.Errors.FirstOrDefault() ?? "Ocorreu um erro ao processar a requisição",
+            detail: result.Errors.Count > 0 ? result.Errors[0] : "Ocorreu um erro ao processar a requisição",
             type: $"{ErrorTypeBaseUrl}/{errorType}",
             extensions: new Dictionary<string, object?>
             {
@@ -42,13 +42,13 @@ public static class ResultExtensions
     {
         var errosPorCampo = new Dictionary<string, string[]>();
 
-        foreach (var erro in result.Errors)
+        foreach (string erro in result.Errors)
         {
-            var partes = erro.Split(':', 2, StringSplitOptions.TrimEntries);
-            var campo = partes.Length == 2 ? partes[0] : "_general";
-            var mensagem = partes.Length == 2 ? partes[1] : erro;
+            string[] partes = erro.Split(':', 2, StringSplitOptions.TrimEntries);
+            string campo = partes.Length == 2 ? partes[0] : "_general";
+            string mensagem = partes.Length == 2 ? partes[1] : erro;
 
-            errosPorCampo[campo] = errosPorCampo.TryGetValue(campo, out var existentes)
+            errosPorCampo[campo] = errosPorCampo.TryGetValue(campo, out string[]? existentes)
                 ? [.. existentes, mensagem]
                 : [mensagem];
         }
