@@ -14,6 +14,17 @@ indent_size = 4
 indent_style = space
 indent_size = 2
 
+# Migrations do EF Core são geradas pela ferramenta "dotnet ef migrations add" e
+# regeneradas a cada alteração de modelo — não são código de autoria manual, então
+# não devem falhar o build por regra de estilo (namespace com escopo de arquivo,
+# final de linha, etc.) nem ser reformatadas.
+[**/Migrations/*.cs]
+generated_code = true
+end_of_line = crlf
+charset = utf-8-bom
+csharp_style_namespace_declarations = block_scoped:silent
+dotnet_diagnostic.IDE0161.severity = silent
+
 # ---------------------------------------------------------------------------
 # DT-005: Padrões de Estilo de Código e Qualidade - Backend
 # ---------------------------------------------------------------------------

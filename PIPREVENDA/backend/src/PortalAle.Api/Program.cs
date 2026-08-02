@@ -1,14 +1,20 @@
 using System.Diagnostics;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using PortalAle.Api.Endpoints;
+using PortalAle.Api.Extensions;
 using PortalAle.Api.Middleware;
+using PortalAle.Data.SqlServer;
 using PortalAle.IoC;
 using Serilog;
 using Serilog.Formatting.Json;
 
-const string ErrorTypeBaseUrl = "https://api.portalale.com.br/errors";
+const string errorTypeBaseUrl = "https://api.portalale.com.br/errors";
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new JsonFormatter())
@@ -37,6 +43,14 @@ try
     builder.Services.AddPortalAleServices(builder.Configuration);
 
     builder.Services.AddOpenApi();
+
+    // Healthcheck de conectividade com o SQL Server (banco mk_gestaoContrato).
+    string sqlServerConnectionString = builder.Configuration.GetConnectionString("PortalAle")
+        ?? throw new InvalidOperationException("ConnectionString 'PortalAle' não configurada.");
+
+    builder.Services
+        .AddHealthChecks()
+        .AddSqlServer(sqlServerConnectionString, name: "sqlserver", tags: ["ready"]);
 
     // Esquema de autenticação (JWT/Azure AD, etc.) ainda não definido para o projeto
     // — AddAuthorization() habilita apenas UseAuthorization()/.RequireAuthorization()
@@ -73,6 +87,14 @@ try
 
     var app = builder.Build();
 
+    // Aplica automaticamente as migrations pendentes do EF Core ao subir a aplicação
+    // (cria o banco/tabelas se ainda não existirem). Ver PortalAle.Data.SqlServer/Persistencia/Migrations.
+    using (IServiceScope migrationScope = app.Services.CreateScope())
+    {
+        ApplicationDbContext dbContext = migrationScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.Migrate();
+    }
+
     app.UseSerilogRequestLogging();
 
     app.UseMiddleware<CorrelationIdMiddleware>();
@@ -97,14 +119,14 @@ try
                     Detail = app.Environment.IsDevelopment()
                         ? exception.Message
                         : "Um ou mais argumentos fornecidos são inválidos",
-                    Type = $"{ErrorTypeBaseUrl}/validation-error",
+                    Type = $"{errorTypeBaseUrl}/validation-error",
                 },
                 UnauthorizedAccessException => new ProblemDetails
                 {
                     Status = StatusCodes.Status403Forbidden,
                     Title = "Acesso Negado",
                     Detail = "Você não tem permissão para acessar este recurso",
-                    Type = $"{ErrorTypeBaseUrl}/forbidden",
+                    Type = $"{errorTypeBaseUrl}/forbidden",
                 },
                 KeyNotFoundException => new ProblemDetails
                 {
@@ -113,7 +135,7 @@ try
                     Detail = app.Environment.IsDevelopment()
                         ? exception.Message
                         : "O recurso solicitado não foi encontrado",
-                    Type = $"{ErrorTypeBaseUrl}/not-found",
+                    Type = $"{errorTypeBaseUrl}/not-found",
                 },
                 _ => new ProblemDetails
                 {
@@ -122,7 +144,7 @@ try
                     Detail = app.Environment.IsDevelopment()
                         ? exception?.Message
                         : "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
-                    Type = $"{ErrorTypeBaseUrl}/internal-error",
+                    Type = $"{errorTypeBaseUrl}/internal-error",
                 },
             };
 
@@ -144,15 +166,35 @@ try
     });
 
     if (app.Environment.IsDevelopment())
+    {
         app.MapOpenApi();
+
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/openapi/v1.json", "PortalAle API v1");
+            options.RoutePrefix = "swagger";
+        });
+    }
 
     app.UseHttpsRedirection();
     app.UseAuthorization();
 
-    // Endpoints de negócio são registrados aqui conforme forem criados, ex.:
-    // app.MapContratosEndpoints();
+    // Healthcheck de infraestrutura — não versionado, não segue o padrão CQRS
+    // (endpoint técnico, não caso de uso de negócio).
+    app.MapHealthChecks("/health", new HealthCheckOptions
+    {
+        ResponseWriter = HealthCheckResponseWriter.WriteAsync,
+    });
+
+    // Endpoints de negócio são registrados aqui conforme forem criados.
+    app.MapClientesEndpoints();
 
     app.Run();
+}
+catch (HostAbortedException)
+{
+    // Lançada intencionalmente pelo host das ferramentas de design-time do EF Core
+    // (ex.: "dotnet ef migrations add") após montar o DI container — não é uma falha real.
 }
 catch (Exception ex)
 {

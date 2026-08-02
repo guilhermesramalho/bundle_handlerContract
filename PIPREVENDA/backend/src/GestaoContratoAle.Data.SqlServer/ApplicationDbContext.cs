@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PortalAle.Domain.Clientes;
 
 namespace PortalAle.Data.SqlServer;
 
@@ -9,6 +10,8 @@ namespace PortalAle.Data.SqlServer;
 /// </summary>
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
+    public DbSet<Cliente> Clientes => Set<Cliente>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("dbo");
