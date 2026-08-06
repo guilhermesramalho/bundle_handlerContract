@@ -8,13 +8,13 @@ public abstract record PaginationRequest : IPaginationRequest
     private const int TamanhoPaginaPadrao = 20;
     private const int TamanhoPaginaMaximo = 100;
 
-    public int PageIndex { get; init; } = 1;
+    public int? PageIndex { get; init; }
 
-    public int PageSize { get; init; } = TamanhoPaginaPadrao;
+    public int? PageSize { get; init; }
 
-    public int NormalizedPageIndex => PageIndex < 1 ? 1 : PageIndex;
+    public int NormalizedPageIndex => PageIndex is null or < 1 ? 1 : PageIndex.Value;
 
-    public int NormalizedPageSize => PageSize is < 1 or > TamanhoPaginaMaximo
+    public int NormalizedPageSize => PageSize is null or < 1 or > TamanhoPaginaMaximo
         ? TamanhoPaginaPadrao
-        : PageSize;
+        : PageSize.Value;
 }

@@ -1,0 +1,57 @@
+# .gitignore raiz do bundle — cobre todo o repositório (backend .NET,
+# frontend Next.js, e qualquer outro subprojeto futuro). backend/.gitignore
+# e frontend/.gitignore já cobrem seus artefatos específicos; este arquivo é
+# a rede de segurança para o resto da árvore, evitando subir qualquer coisa
+# gerada por build/compilação/ferramentas.
+
+# --- .NET / backend ---
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.dll
+*.pdb
+
+# --- Node.js / frontend ---
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/build/
+frontend/*.tsbuildinfo
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+
+# --- Testes ---
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# --- Extração de assets do protótipo (pasta de trabalho, não versionar —
+# ver PLANO-IMPLEMENTACAO-FRONTEND.md seção 0) ---
+PIPREVENDA/docs/modelo-frontend/_extraido/
+
+# --- Variáveis de ambiente / segredos ---
+.env
+.env.*
+!.env.example
+
+# --- IDE / editor ---
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# --- SO ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs ---
+logs/
+*.log

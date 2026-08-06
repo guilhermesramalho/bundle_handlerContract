@@ -12,7 +12,7 @@
 
 ## Contexto
 
-O backend ProjSub é uma aplicação distribuída que integra com múltiplos sistemas externos (CAv4, AIDA, SharePoint, Hub de Modelos) e serve um frontend Angular. Identificamos os seguintes desafios:
+O backend PortalAle é uma aplicação distribuída que integra com múltiplos sistemas externos (ver skills `integracao-sap`/`integracao-elaw` para os contratos específicos do PIPREVENDA-1680) e serve o frontend React/Next.js. Identificamos os seguintes desafios:
 
 1. **Logs desestruturados**: Mensagens de log em texto livre dificultam análise, busca e correlação entre requisições
 2. **Exposição de detalhes técnicos**: Stack traces e mensagens de erro internas são expostas ao frontend, representando risco de segurança
@@ -27,7 +27,7 @@ O backend ProjSub é uma aplicação distribuída que integra com múltiplos sis
 
 ## Decisão
 
-Adotar os seguintes padrões para logs e tratamento de exceções no backend ProjSub:
+Adotar os seguintes padrões para logs e tratamento de exceções no backend PortalAle:
 
 ### 1. Logs Estruturados com Serilog
 
@@ -43,11 +43,11 @@ builder.Host.UseSerilog((context, configuration) =>
         .Enrich.FromLogContext()
         .Enrich.WithMachineName()
         .Enrich.WithEnvironmentName()
-        .Enrich.WithProperty("Aplicacao", "ProjSub-Backend")
+        .Enrich.WithProperty("Aplicacao", "PortalAle.Api")
         .WriteTo.Console(new JsonFormatter())
         .WriteTo.File(
             new JsonFormatter(),
-            "logs/projsub-.log",
+            "logs/portalale-.log",
             rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 30);
 });
@@ -281,8 +281,8 @@ _logger.LogInformation(
   "ProjetoId": 42,
   "UserId": "f0q3",
   "ProjetoNome": "Novo Poço P-99",
-  "Aplicacao": "ProjSub-Backend",
-  "MachineName": "projsub-backend-001",
+  "Aplicacao": "PortalAle.Api",
+  "MachineName": "portalale-api-001",
   "EnvironmentName": "Production"
 }
 ```

@@ -5,17 +5,21 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalAle.Domain", "src\PortalAle.Domain\PortalAle.Domain.csproj", "{149D5BF5-48E9-45FB-BC87-A28A10FC451B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.Domain", "src\GestaoContratoAle.Domain\GestaoContratoAle.Domain.csproj", "{149D5BF5-48E9-45FB-BC87-A28A10FC451B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalAle.Application", "src\PortalAle.Application\PortalAle.Application.csproj", "{1EB1568A-9A67-41E8-BB74-835AFE62DF19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.Application", "src\GestaoContratoAle.Application\GestaoContratoAle.Application.csproj", "{1EB1568A-9A67-41E8-BB74-835AFE62DF19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalAle.Data", "src\PortalAle.Data\PortalAle.Data.csproj", "{A1813385-FE61-480E-9BA3-EACCBFD2DA45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.Data", "src\GestaoContratoAle.Data\GestaoContratoAle.Data.csproj", "{A1813385-FE61-480E-9BA3-EACCBFD2DA45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalAle.Data.SqlServer", "src\PortalAle.Data.SqlServer\PortalAle.Data.SqlServer.csproj", "{A9F5F4AA-86A5-426C-AC03-D173F7B2DA30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.Data.SqlServer", "src\GestaoContratoAle.Data.SqlServer\GestaoContratoAle.Data.SqlServer.csproj", "{A9F5F4AA-86A5-426C-AC03-D173F7B2DA30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalAle.IoC", "src\PortalAle.IoC\PortalAle.IoC.csproj", "{F5515327-7221-43DB-80D2-42EFCA9D63B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.IoC", "src\GestaoContratoAle.IoC\GestaoContratoAle.IoC.csproj", "{F5515327-7221-43DB-80D2-42EFCA9D63B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalAle.Api", "src\PortalAle.Api\PortalAle.Api.csproj", "{69341435-EDF1-4F70-9438-7C344A03E98F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.Domain.Tests", "src\GestaoContratoAle.Domain.Tests\GestaoContratoAle.Domain.Tests.csproj", "{D649572F-286C-4D49-95AB-843A3AEDE391}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoContratoAle.Application.Tests", "src\GestaoContratoAle.Application.Tests\GestaoContratoAle.Application.Tests.csproj", "{B0F435C0-B3AC-4D44-8B20-56E10EA53333}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +103,30 @@ Global
 		{69341435-EDF1-4F70-9438-7C344A03E98F}.Release|x64.Build.0 = Release|Any CPU
 		{69341435-EDF1-4F70-9438-7C344A03E98F}.Release|x86.ActiveCfg = Release|Any CPU
 		{69341435-EDF1-4F70-9438-7C344A03E98F}.Release|x86.Build.0 = Release|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Debug|x64.Build.0 = Debug|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Debug|x86.Build.0 = Debug|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Release|x64.ActiveCfg = Release|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Release|x64.Build.0 = Release|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Release|x86.ActiveCfg = Release|Any CPU
+		{D649572F-286C-4D49-95AB-843A3AEDE391}.Release|x86.Build.0 = Release|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Debug|x64.Build.0 = Debug|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Debug|x86.Build.0 = Debug|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Release|x64.ActiveCfg = Release|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Release|x64.Build.0 = Release|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Release|x86.ActiveCfg = Release|Any CPU
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,5 +138,7 @@ Global
 		{A9F5F4AA-86A5-426C-AC03-D173F7B2DA30} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{F5515327-7221-43DB-80D2-42EFCA9D63B6} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{69341435-EDF1-4F70-9438-7C344A03E98F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{D649572F-286C-4D49-95AB-843A3AEDE391} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{B0F435C0-B3AC-4D44-8B20-56E10EA53333} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,43 @@
+/* ALE Design System — resets e defaults de página.
+   Extraído de docs/modelo-frontend/prototipo.html. Depende de tokens.css
+   estar carregado antes. Ver PLANO-IMPLEMENTACAO-FRONTEND.md, Fase F0. */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-default);
+  color: var(--text-primary);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Classes utilitárias de papel de texto (sugar opcional para telas/specimens) */
+.t-display-lg { font: var(--text-display-lg); letter-spacing: var(--letter-spacing-tight); }
+.t-display-md { font: var(--text-display-md); }
+.t-heading-lg { font: var(--text-heading-lg); }
+.t-heading-md { font: var(--text-heading-md); }
+.t-label-lg   { font: var(--text-label-lg); }
+.t-label-md   { font: var(--text-label-md); }
+.t-body-lg    { font: var(--text-body-lg); }
+.t-body-md    { font: var(--text-body-md); }
+.t-caption    { font: var(--text-caption); color: var(--text-secondary); }
+.t-micro      { font: var(--text-micro); letter-spacing: var(--letter-spacing-wide); }

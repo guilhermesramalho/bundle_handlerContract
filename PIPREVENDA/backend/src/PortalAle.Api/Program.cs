@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -10,6 +11,7 @@ using PortalAle.Api.Endpoints;
 using PortalAle.Api.Extensions;
 using PortalAle.Api.Middleware;
 using PortalAle.Data.SqlServer;
+using PortalAle.Data.SqlServer.Persistencia.Seed;
 using PortalAle.IoC;
 using Serilog;
 using Serilog.Formatting.Json;
@@ -42,7 +44,28 @@ try
     // Registro agregado de Application + Data.SqlServer via composition root. Ver PortalAle.IoC.
     builder.Services.AddPortalAleServices(builder.Configuration);
 
+    // Enums de domínio (Segmento, TipoContrato, etc.) trafegam como string no JSON
+    // ("Rede", não "0") — mais legível na API pública e alinhado ao que os filtros de
+    // query string já aceitam via [AsParameters] (enum.TryParse por nome).
+    builder.Services.ConfigureHttpJsonOptions(options =>
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
     builder.Services.AddOpenApi();
+
+    // CORS para o frontend Next.js rodando em origem separada (localhost:3000) — sem
+    // isso o navegador bloqueia o fetch com "Failed to fetch" mesmo com a API no ar e
+    // saudável (curl/servidor-a-servidor não é afetado, só o browser aplica CORS,
+    // descoberto testando a integração de verdade no Chrome). Origens configuráveis via
+    // appsettings ("Cors:AllowedOrigins") para não hardcodar a porta do frontend aqui.
+    const string corsPolicyFrontend = "FrontendPolicy";
+    string[] corsAllowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+        ?? ["http://localhost:3000"];
+
+    builder.Services.AddCors(options =>
+        options.AddPolicy(corsPolicyFrontend, policy => policy
+            .WithOrigins(corsAllowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()));
 
     // Healthcheck de conectividade com o SQL Server (banco mk_gestaoContrato).
     string sqlServerConnectionString = builder.Configuration.GetConnectionString("PortalAle")
@@ -93,6 +116,12 @@ try
     {
         ApplicationDbContext dbContext = migrationScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         dbContext.Database.Migrate();
+
+        // Seed de desenvolvimento (dataset mock do frontend) — nunca em produção,
+        // idempotente (só insere se a tabela Contrato estiver vazia). Ver
+        // PortalAle.Data.SqlServer/Persistencia/Seed/DesenvolvimentoSeeder.cs.
+        if (app.Environment.IsDevelopment())
+            await DesenvolvimentoSeeder.SeedAsync(dbContext);
     }
 
     app.UseSerilogRequestLogging();
@@ -177,6 +206,7 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseCors(corsPolicyFrontend);
     app.UseAuthorization();
 
     // Healthcheck de infraestrutura — não versionado, não segue o padrão CQRS
@@ -188,6 +218,8 @@ try
 
     // Endpoints de negócio são registrados aqui conforme forem criados.
     app.MapClientesEndpoints();
+    app.MapGruposEconomicosEndpoints();
+    app.MapContratosEndpoints();
 
     app.Run();
 }

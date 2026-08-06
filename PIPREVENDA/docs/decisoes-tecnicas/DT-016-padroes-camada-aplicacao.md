@@ -75,7 +75,7 @@ Essa centralização evita duplicação de conteúdo e reduz o esforço de manut
 A organização principal permanece por agregado/entidade e ação:
 
 ```text
-ProjSub.Aplicacao/
+PortalAle.Application/
 ├── Base/
 │   ├── IRequest.cs
 │   ├── ICommandHandler.cs

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\PortalAle.Data\PortalAle.Data.csproj" />
+    <ProjectReference Include="..\GestaoContratoAle.Data\GestaoContratoAle.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

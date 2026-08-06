@@ -588,7 +588,7 @@ As configurações de mapeamento do Entity Framework Core devem ser organizadas 
 
 ```
 src/
-└── ProjSub.Infraestrutura/
+└── PortalAle.Data.SqlServer/
     └── Persistencia/
         ├── Configuracoes/              ← DIRETÓRIO DE CONFIGURAÇÕES DE MAPEAMENTO
         │   ├── UsuarioConfiguration.cs
@@ -891,7 +891,7 @@ Esta decisão está alinhada com:
 Ao criar uma nova configuração de entidade no diretório `Persistencia/Configuracoes`, verificar:
 
 - [ ] Classe implementa `IEntityTypeConfiguration<TEntity>`
-- [ ] Classe está no diretório correto: `ProjSub.Infraestrutura/Persistencia/Configuracoes`
+- [ ] Classe está no diretório correto: `PortalAle.Data.SqlServer/Persistencia/Configuracoes`
 - [ ] Nome de tabela e esquema configurados
 - [ ] Chave primária configurada com nome de constraint
 - [ ] Todas as propriedades têm tipo de coluna explícito e tamanho máximo definido

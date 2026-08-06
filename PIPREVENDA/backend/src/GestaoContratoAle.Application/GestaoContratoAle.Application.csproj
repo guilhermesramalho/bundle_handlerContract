@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\PortalAle.Domain\PortalAle.Domain.csproj" />
+    <ProjectReference Include="..\GestaoContratoAle.Domain\GestaoContratoAle.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

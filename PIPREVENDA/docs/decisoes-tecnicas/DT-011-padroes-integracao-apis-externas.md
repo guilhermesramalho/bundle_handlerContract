@@ -130,11 +130,11 @@ Infraestrutura (Adaptadores HTTP)
 ### 1. Estrutura de Pastas
 
 ```
-ProjSub.Aplicacao/
+PortalAle.Application/
 └── Services/
     └── IAidaProjetoService.cs        # Interface (Porta)
 
-ProjSub.Infraestrutura/
+PortalAle.Data/
 └── Aida/
     ├── AidaProjetoService.cs         # Adaptador HTTP
     └── AidaConfig.cs                 # Configuração
@@ -142,12 +142,12 @@ ProjSub.Infraestrutura/
 
 ### 2. Interface na Camada de Aplicação (Porta)
 
-**Localização**: `ProjSub.Aplicacao/Services/IAidaProjetoService.cs`
+**Localização**: `PortalAle.Application/Services/IAidaProjetoService.cs`
 
 ```csharp
-using ProjSub.Dominio.Projetos;
+using PortalAle.Domain.Projetos;
 
-namespace ProjSub.Aplicacao.Services;
+namespace PortalAle.Application.Services;
 
 /// <summary>
 /// Serviço de consulta ao AIDA (sistema de projetos Petrobras).
@@ -171,13 +171,13 @@ public interface IAidaProjetoService
 
 ### 3. Implementação na Infraestrutura (Adaptador)
 
-**Localização**: `ProjSub.Infraestrutura/Aida/AidaProjetoService.cs`
+**Localização**: `PortalAle.Data/Aida/AidaProjetoService.cs`
 
 ```csharp
-using ProjSub.Aplicacao.Services;
-using ProjSub.Dominio.Projetos;
+using PortalAle.Application.Services;
+using PortalAle.Domain.Projetos;
 
-namespace ProjSub.Infraestrutura.Aida;
+namespace PortalAle.Data.Aida;
 
 public class AidaProjetoService : IAidaProjetoService
 {
@@ -237,10 +237,10 @@ public class AidaProjetoService : IAidaProjetoService
 
 ### 4. Configuração (Options Pattern)
 
-**Localização**: `ProjSub.Infraestrutura/Aida/AidaConfig.cs`
+**Localização**: `PortalAle.Data/Aida/AidaConfig.cs`
 
 ```csharp
-namespace ProjSub.Infraestrutura.Aida;
+namespace PortalAle.Data.Aida;
 
 public class AidaConfig
 {
@@ -258,10 +258,10 @@ public class AidaConfig
 
 ### 5. Registro de Dependências (DI)
 
-**Localização**: `ProjSub.Infraestrutura/DependencyInjection.cs`
+**Localização**: `PortalAle.Data/DependencyInjection.cs`
 
 ```csharp
-public static IServiceCollection AddInfraestrutura(
+public static IServiceCollection AddData(
     this IServiceCollection services, IConfiguration config)
 {
     // Configurar options e validar
@@ -510,9 +510,9 @@ _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
 
 ### 10. Checklist de Implementação
 
-✅ Interface criada em `ProjSub.Aplicacao/Services/`  
+✅ Interface criada em `PortalAle.Application/Services/`  
 ✅ Interface retorna tipos do domínio (não DTOs externos)  
-✅ Implementação em `ProjSub.Infraestrutura/{Sistema}/`  
+✅ Implementação em `PortalAle.Data/{Sistema}/`  
 ✅ DTOs externos são `private` ou `internal`  
 ✅ Método de mapeamento Anti-Corruption implementado  
 ✅ Configuração via `IOptions<{Sistema}Config>`  
@@ -543,12 +543,12 @@ _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
 
 - [DT-005: Padrões de Estilo de Código Backend](DT-005-padroes-estilo-codigo-backend.md)
 - [DT-007: Padrões de Logs e Exceções](DT-007-padroes-logs-tratamento-excecoes.md)
-- [DT-008: Estratégia de Testes Backend](DT-008-estrategia-padroes-testes-backend.md)
+- [DT-008: Estratégia de Testes Backend](DT-008-padroes-testes-backend.md)
 
-**Arquitetura:**
+**Integrações reais do PIPREVENDA-1680:**
 
-- [Arquitetura a11732](../arquitetura-a11732.md) - Visão geral C4
-- [Catálogo de Integrações Externas](../outros/catalogo-integracoes-externas.md) - Detalhamento de todas as APIs
+- Skill `integracao-sap` — pipeline ADF, staging, Service Bus, Worker consumidor
+- Skill `integracao-elaw` — aba Jurídico, notificações, processos
 
 ---
 
@@ -556,7 +556,7 @@ _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
 
 Ao gerar código de integração com APIs externas, sempre:
 
-1. Criar interface em `ProjSub.Aplicacao/Services/I{Sistema}Service.cs`
+1. Criar interface em `PortalAle.Application/Services/I{Sistema}Service.cs`
 2. Retornar tipos do domínio, nunca DTOs externos
 3. Implementar Anti-Corruption Layer com método `MapearParaDominio()`
 4. Usar `HttpClientFactory`, nunca `new HttpClient()`

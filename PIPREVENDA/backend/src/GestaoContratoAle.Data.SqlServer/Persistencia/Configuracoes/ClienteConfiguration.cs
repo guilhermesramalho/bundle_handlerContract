@@ -72,9 +72,38 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
             .IsRequired(false)
             .HasComment("Data e hora da exclusão lógica do registro (soft delete)");
 
+        builder.Property(cliente => cliente.NrSap)
+            .HasColumnName("NrSap")
+            .HasColumnType("varchar(10)")
+            .HasMaxLength(10)
+            .IsRequired(false)
+            .HasComment("Número SAP do cliente (10 dígitos) — identifica o cliente (contexto seção 9)");
+
+        builder.Property(cliente => cliente.Uf)
+            .HasColumnName("SgUf")
+            .HasColumnType("char(2)")
+            .HasMaxLength(2)
+            .IsRequired(false)
+            .HasComment("UF do CNPJ/ponto de venda");
+
+        builder.Property(cliente => cliente.GrupoEconomicoId)
+            .HasColumnName("IdGrupoEconomico")
+            .HasColumnType("int")
+            .IsRequired(false)
+            .HasComment("Grupo econômico ao qual o cliente pertence (opcional)");
+
+        builder.HasOne(cliente => cliente.GrupoEconomico)
+            .WithMany()
+            .HasForeignKey(cliente => cliente.GrupoEconomicoId)
+            .HasConstraintName("FK_Cliente_GrupoEconomico")
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(cliente => cliente.Cnpj)
             .HasDatabaseName("UQ_Cliente_NrCnpj")
             .IsUnique();
+
+        builder.HasIndex(cliente => cliente.GrupoEconomicoId)
+            .HasDatabaseName("IX_Cliente_IdGrupoEconomico");
 
         // Soft delete: registros excluídos logicamente não aparecem nas consultas por padrão.
         builder.HasQueryFilter(cliente => cliente.DataExclusao == null);

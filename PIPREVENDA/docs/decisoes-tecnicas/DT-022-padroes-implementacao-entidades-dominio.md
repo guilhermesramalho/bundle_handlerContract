@@ -14,7 +14,7 @@
 
 ## Contexto
 
-O projeto backend +Digital A11732 é desenvolvido seguindo os princípios de **Clean Architecture** e **Domain-Driven Design (DDD)**. A camada de domínio (`ProjSub.Dominio`) é o núcleo da aplicação, contendo as regras de negócio e o modelo conceitual do sistema.
+O backend PortalAle (PIPREVENDA-1680) é desenvolvido seguindo os princípios de **Clean Architecture** e **Domain-Driven Design (DDD)**. A camada de domínio (`PortalAle.Domain`) é o núcleo da aplicação, contendo as regras de negócio e o modelo conceitual do sistema.
 
 ### Problemas Identificados sem Padrões Claros
 
@@ -268,7 +268,7 @@ public class ProjetoValidationException : DomainException
 
 ### 8. Testes Unitários Obrigatórios
 
-**Toda regra de negócio em entidade DEVE ter teste unitário** em `ProjSub.DominioTestes`:
+**Toda regra de negócio em entidade DEVE ter teste unitário** em `PortalAle.Domain.Tests`:
 
 ```csharp
 public class ProjetoTests
@@ -453,7 +453,7 @@ public class Risco : Entity
 
 ### Passo 1: Estrutura Base
 
-Garantir que `ProjSub.Dominio/Base/Entity.cs` exista:
+Garantir que `PortalAle.Domain/Base/Entity.cs` exista:
 
 ```csharp
 public class Entity
@@ -469,10 +469,10 @@ public class Entity
 ### Passo 2: Criar Entidade com Template
 
 ```csharp
-using ProjSub.Dominio.Base;
-using ProjSub.Dominio.Exceptions;
+using PortalAle.Domain.Base;
+using PortalAle.Domain.Exceptions;
 
-namespace ProjSub.Dominio;
+namespace PortalAle.Domain;
 
 public class NomeEntidade : Entity
 {
@@ -532,10 +532,10 @@ public class NomeEntidade : Entity
 ### Passo 3: Criar Testes Unitários
 
 ```csharp
-// ProjSub.DominioTestes/NomeEntidadeTests.cs
+// PortalAle.Domain.Tests/NomeEntidadeTests.cs
 using Xunit;
-using ProjSub.Dominio;
-using ProjSub.Dominio.Exceptions;
+using PortalAle.Domain;
+using PortalAle.Domain.Exceptions;
 
 public class NomeEntidadeTests
 {
@@ -674,7 +674,7 @@ Use este checklist para auditar se o padrão está sendo seguido:
 
 ### Testes Unitários
 
-- [ ] Toda regra de negócio tem teste unitário em `ProjSub.DominioTestes`
+- [ ] Toda regra de negócio tem teste unitário em `PortalAle.Domain.Tests`
 - [ ] Testes para construtores (casos válidos e inválidos)
 - [ ] Testes para métodos de mutação
 - [ ] Testes verificam lançamento de `DomainException` com mensagem correta
@@ -918,15 +918,13 @@ public class Fornecedor : Entity
 - **[Domain Entities](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model)** - .NET Core microservice domain model
 - **[Value Objects](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects)** - Implementing value objects
 
-### Projeto +Digital A11732
+### PIPREVENDA-1680
 
 - **[DT-004: Mapeamento Objeto-Relacional com EF Core](DT-004-mapeamento-objeto-relacional-ef-core.md)** - Configuração de mapeamento
 - **[DT-005: Padrões de Estilo de Código Backend](DT-005-padroes-estilo-codigo-backend.md)** - Convenções C#
 - **[DT-008: Estratégia de Testes Unitários](DT-008-padroes-testes-backend.md)** - Testes de domínio
 - **[DT-016: Padrões da Camada de Aplicação](DT-016-padroes-camada-aplicacao.md)** - CQRS e handlers
 - **[DT-018: Padrão de Implementação de Repositórios](DT-018-padrao-implementacao-repositorios.md)** - Interfaces de persistência
-- **[backend-webapi-components.md](../arquitetura/backend-webapi-components.md)** - Arquitetura geral do backend
-- **[entidade-dominio.instructions.md](../../.github/instructions/entidade-dominio.instructions.md)** - Instruction file para Copilot
 
 ---
 
@@ -965,4 +963,4 @@ Este padrão se aplica à **camada de domínio**. Não aplicar em:
 **Data de Criação**: 2026-03-22  
 **Última Atualização**: 2026-03-22  
 **Status**: ✅ Aprovado  
-**Autor**: Equipe Backend +Digital A11732
+**Autor**: Equipe Backend PIPREVENDA-1680

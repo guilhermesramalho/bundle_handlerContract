@@ -12,11 +12,11 @@
 
 ## Contexto
 
-A API ProjSub necessita de um padrão consistente para:
+A API PortalAle necessita de um padrão consistente para:
 
 1. **Retorno de Erros Estruturados**: Fornecer informações detalhadas sobre erros de forma padronizada
 2. **Rastreabilidade**: Incluir identificadores únicos (traceId) para correlação de logs
-3. **Frontend Friendly**: Erros em formato facilmente consumível pelo Angular
+3. **Frontend Friendly**: Erros em formato facilmente consumível pelo frontend React/Next.js
 4. **Padrões Internacionais**: Seguir RFC 7807 (ProblemDetails for HTTP APIs)
 5. **Erros de Validação**: Agrupar erros por campo para facilitar exibição em formulários
 6. **Exceções Não Tratadas**: Middleware global para capturar e converter exceções em ProblemDetails
@@ -99,7 +99,7 @@ Para erros genéricos:
 **Exemplo - Command Handler:**
 
 ```csharp
-// ProjSub.Aplicacao/Projetos/Commands/CriarProjetoCommandHandler.cs
+// PortalAle.Application/Projetos/Commands/CriarProjetoCommandHandler.cs
 public class CriarProjetoCommandHandler
     : ICommandHandler<CriarProjetoCommand, Result<CriarProjetoResult>>
 {
@@ -144,7 +144,7 @@ public class CriarProjetoCommandHandler
 **Exemplo - Query Handler:**
 
 ```csharp
-// ProjSub.Aplicacao/Projetos/Queries/ConsultarProjetoQueryHandler.cs
+// PortalAle.Application/Projetos/Queries/ConsultarProjetoQueryHandler.cs
 public class ConsultarProjetoQueryHandler
     : IQueryHandler<ConsultarProjetoQuery, Result<ConsultarProjetoResult>>
 {
@@ -169,8 +169,8 @@ public class ConsultarProjetoQueryHandler
 **Helper Extensions para Converter Result em ProblemDetails:**
 
 ```csharp
-// ProjSub.WebAPI/Extensions/ResultExtensions.cs
-namespace ProjSub.WebAPI.Extensions;
+// PortalAle.Api/Extensions/ResultExtensions.cs
+namespace PortalAle.Api.Extensions;
 
 public static class ResultExtensions
 {
@@ -257,7 +257,7 @@ private static async Task<IResult> ExcluirProjeto(
 Para erros de validação com múltiplos campos, use `ValidationProblem` que agrupa erros por campo:
 
 ```csharp
-// ProjSub.WebAPI/Extensions/ResultExtensions.cs
+// PortalAle.Api/Extensions/ResultExtensions.cs
 public static class ResultExtensions
 {
     /// <summary>
@@ -358,7 +358,7 @@ Configure middleware global para capturar exceções não tratadas e convertê-l
 **Configuração no Program.cs:**
 
 ```csharp
-// ProjSub.WebAPI/Program.cs
+// PortalAle.Api/Program.cs
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurar ProblemDetails globalmente
@@ -497,7 +497,7 @@ app.Run();
   "traceId": "00-abc123-def456-00",
   "timestamp": "2026-02-16T10:30:00Z",
   "environment": "Development",
-  "stackTrace": "at ProjSub.WebAPI.Endpoints.ProjetosEndpoints...",
+  "stackTrace": "at PortalAle.Api.Endpoints.ProjetosEndpoints...",
   "exceptionType": "NullReferenceException"
 }
 ```

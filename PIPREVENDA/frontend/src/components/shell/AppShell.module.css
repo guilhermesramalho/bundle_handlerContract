@@ -1,0 +1,113 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-page);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  height: 64px;
+  padding-inline: var(--space-xxs);
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.logo {
+  font: var(--text-heading-md);
+  color: var(--brand-primary);
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xxxs);
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding-inline: var(--space-xxxxs);
+  border-radius: var(--radius-sm);
+  font: var(--text-label-lg);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+
+.navLink:hover {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+}
+
+.navLinkActive {
+  color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+}
+
+.search {
+  flex: 1;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xxxs);
+}
+
+.notifWrap {
+  position: relative;
+}
+
+.notifPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  z-index: 40;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-xxxs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-nano);
+}
+
+.notifTitle {
+  font: var(--text-label-lg);
+  color: var(--text-primary);
+}
+
+.notifEmpty {
+  font: var(--text-body-md);
+  color: var(--text-tertiary);
+  padding: var(--space-xs) 0;
+  text-align: center;
+}
+
+.userPlaceholder {
+  display: flex;
+  align-items: center;
+  gap: var(--space-nano);
+}
+
+.userLabel {
+  font: var(--text-label-md);
+  color: var(--text-secondary);
+}
+
+.main {
+  flex: 1;
+}

@@ -32,7 +32,7 @@ Implementar controle transacional automático usando **Decorator Pattern** combi
 
 #### 1. IUnitOfWork (Domínio)
 
-**Arquivo:** `ProjSub.Dominio/Base/IUnitOfWork.cs`
+**Arquivo:** `PortalAle.Domain/Base/IUnitOfWork.cs`
 
 Interface que define o contrato agnóstico de infraestrutura para controle transacional:
 
@@ -49,13 +49,13 @@ public interface IUnitOfWork : IDisposable
 
 #### 2. UnitOfWork (Infraestrutura)
 
-**Arquivo:** `ProjSub.Infraestrutura/Persistencia/UnitOfWork.cs`
+**Arquivo:** `PortalAle.Data/UnitOfWork.cs`
 
 Implementação concreta usando EF Core + PostgreSQL com logging estruturado e tratamento de erros.
 
 #### 3. TransactionCommandHandlerDecorator (Aplicação)
 
-**Arquivo:** `ProjSub.Aplicacao/Base/TransactionCommandHandlerDecorator.cs`
+**Arquivo:** `PortalAle.Application/Base/TransactionCommandHandlerDecorator.cs`
 
 Decorator que intercepta automaticamente todos CommandHandlers e gerencia transações:
 

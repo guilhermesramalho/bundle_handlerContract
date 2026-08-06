@@ -5,13 +5,15 @@ description: Padrões de arquitetura do frontend React/Next.js do PIPREVENDA-168
 
 # Arquitetura — Frontend Next.js (PIPREVENDA-1680)
 
-> Status: ainda não há DTs (Decisões Técnicas) detalhadas de frontend
-> equivalentes às de backend neste bundle. Esta skill reflete o que já está
-> definido em `context/CONTEXTO-COMPLETO-PROJETO.md` (seção 12) — quando
-> DTs de frontend forem criadas (nomenclatura de componentes, padrão de
-> formulário, gerenciamento de estado, testes de UI), adicione-as em
-> `docs/decisoes-tecnicas/` e referencie aqui, seguindo o mesmo padrão da
-> skill `padroes-tecnicos-backend-dotnet`.
+> Status: já existem DTs de frontend — `DT-023` (estilo) e `DT-024`
+> (testes). As próximas (nomenclatura de componentes, padrão de
+> formulário, gerenciamento de estado) devem seguir o mesmo padrão:
+> adicionar em `docs/decisoes-tecnicas/` e referenciar aqui.
+
+## DTs de frontend
+
+- **[DT-023](../../../docs/decisoes-tecnicas/DT-023-estrategia-estilo-frontend.md)** — Estratégia de estilo: CSS custom properties (tokens) + CSS Modules, sem Tailwind. Componentes do Design System (`src/components/ui/**`) usam `style` inline com `var(--token)`, fiel ao protótipo; composições de tela usam `*.module.css`.
+- **[DT-024](../../../docs/decisoes-tecnicas/DT-024-padroes-testes-frontend.md)** — Estratégia de testes: Vitest + React Testing Library para unitário/integração (MSW para mock de rede), Playwright para E2E dos fluxos críticos. Testes co-localizados (`Componente.tsx` + `Componente.test.tsx`); E2E em `e2e/`. Nomenclatura `[Cenário]_[ResultadoEsperado]` e estrutura AAA obrigatórias.
 
 ## Decisões já confirmadas (fonte: contexto do projeto, seção 12)
 

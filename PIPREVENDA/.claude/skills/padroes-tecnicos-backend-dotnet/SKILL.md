@@ -8,21 +8,24 @@ description: Padrões técnicos OBRIGATÓRIOS para qualquer implementação no b
 ## ⚠️ Aviso de adaptação de stack (leia antes de aplicar qualquer DT)
 
 As Decisões Técnicas (DT) indexadas abaixo foram originalmente escritas para outro
-projeto (nomenclatura interna "ProjSub" / "+Digital", padrão corporativo Petrobras
-PE-2TIC-00319). O **padrão arquitetural, os nomes de camadas, o CQRS, o Result
-Pattern, o Decorator de transação e as convenções de código são para adotar
-tal como estão** — é isso que este bundle formaliza como padrão do PIPREVENDA-1680.
+projeto (padrão corporativo Petrobras PE-2TIC-00319) e já foram revisadas para
+remover a nomenclatura interna do projeto de origem ("ProjSub" / "+Digital"),
+substituída por `PortalAle.*` (namespace real deste backend — `PortalAle.Domain`,
+`PortalAle.Application`, `PortalAle.Data`/`PortalAle.Data.SqlServer`, `PortalAle.Api`,
+`PortalAle.IoC`) e pelo nome do projeto (PIPREVENDA-1680) nas menções de contexto.
+O **padrão arquitetural, os nomes de camadas, o CQRS, o Result Pattern, o
+Decorator de transação e as convenções de código são para adotar tal como
+estão** — é isso que este bundle formaliza como padrão do PIPREVENDA-1680.
 
-Mas alguns detalhes de stack **citados dentro dos DTs não se aplicam literalmente**
-ao PIPREVENDA-1680 e devem ser mentalmente substituídos pelo agente:
+Alguns detalhes de stack **ainda citados dentro dos DTs não se aplicam
+literalmente** ao PIPREVENDA-1680 e devem ser mentalmente substituídos pelo agente:
 
 | No DT está escrito | Neste projeto (PIPREVENDA-1680) é |
 |---|---|
-| PostgreSQL (DT-003, DT-004) | **SQL Server** — usar a mesma lógica de convenção de nomenclatura do DT-003, mas validando tipos/sintaxe contra SQL Server, não Postgres |
+| PostgreSQL (DT-003, DT-004, DT-021) | **SQL Server** — usar a mesma lógica de convenção de nomenclatura do DT-003, mas validando tipos/sintaxe contra SQL Server, não Postgres |
 | .NET 9 (DT-005, DT-006) | **.NET 10** |
-| `ProjSub.*` como prefixo de projeto/namespace | `PortalAle.*` (ou o nome real da solution quando criada) |
 | SonarQube `sonar.petrobras.com.br` | instância de SonarQube deste projeto, quando definida |
-| Integrações citadas como exemplo (CAv4, AIDA, Força Trabalho) no DT-011 | nossas integrações reais: **SAP, PCR, Elaw, ANP, Data Lake** (ver skills `integracao-sap` e `integracao-elaw`) |
+| Integrações citadas como exemplo (AIDA, worked example do DT-011) | nossas integrações reais: **SAP, PCR, Elaw, ANP, Data Lake** (ver skills `integracao-sap` e `integracao-elaw`) — o padrão de Anti-Corruption Layer do DT-011 é para seguir tal como está, só o sistema-exemplo (AIDA) não é real aqui |
 
 Se um DT tiver instrução que conflite diretamente com a arquitetura do
 PIPREVENDA-1680 documentada em `context/CONTEXTO-COMPLETO-PROJETO.md` (seção 12),

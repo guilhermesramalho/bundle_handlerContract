@@ -10,7 +10,7 @@
 
 ## Contexto
 
-No desenvolvimento do backend do Projeto +Digital (A11732), seguimos Clean Architecture e Domain-Driven Design (DDD), onde entidades de domínio são a base da modelagem de negócio. Para persistir essas entidades, precisamos de um padrão consistente que:
+No desenvolvimento do backend PortalAle (PIPREVENDA-1680), seguimos Clean Architecture e Domain-Driven Design (DDD), onde entidades de domínio são a base da modelagem de negócio. Para persistir essas entidades, precisamos de um padrão consistente que:
 
 1. **Abstraia a camada de persistência** do domínio (inversão de dependência)
 2. **Respeite o conceito de Aggregate Root** do DDD (apenas raízes de agregação têm repositórios)
@@ -79,13 +79,13 @@ public class ListarProjetosQueryHandler
 
 **Interfaces de Repositório (Camada de Domínio):**
 
-- **Localização:** `ProjSub.Dominio/Repositorios/I[NomeEntidade]Repository.cs`
+- **Localização:** `PortalAle.Domain/Repositorios/I[NomeEntidade]Repository.cs`
 - **Herança obrigatória:** Todas as interfaces herdam de `IRepository<T>`
 - **Métodos:** Apenas métodos específicos além dos básicos (filtros complexos, includes especiais)
 
 **Implementações Concretas (Camada de Infraestrutura):**
 
-- **Localização:** `ProjSub.Infraestrutura/Persistencia/Repositorios/[NomeEntidade]Repository.cs`
+- **Localização:** `PortalAle.Data.SqlServer/Persistencia/Repositorios/[NomeEntidade]Repository.cs`
 - **Herança obrigatória:** Classes herdam de `Repository<T>` e implementam `I[NomeEntidade]Repository`
 - **Criação condicional:** Apenas criar classe concreta se houver métodos específicos
 
@@ -180,7 +180,7 @@ Antes de criar um repositório, validar se a entidade é uma raiz de agregação
 - [ ] Entidade controla o acesso a entidades filhas?
 - [ ] Entidade garante invariantes de negócio da agregação?
 
-**Exemplos de Aggregate Roots no ProjSub:**
+**Exemplos de Aggregate Roots:**
 
 - ✅ `Projeto` (raiz) → contém `Subprojetos`, `Marcos` (entidades filhas)
 - ✅ `Configuracao` (raiz) → contém `TipoConfiguracao` (entidade relacionada)
@@ -193,12 +193,12 @@ Antes de criar um repositório, validar se a entidade é uma raiz de agregação
 
 ### Passo 2: Criar Interface de Repositório
 
-**Localização:** `ProjSub.Dominio/Repositorios/I[NomeEntidade]Repository.cs`
+**Localização:** `PortalAle.Domain/Repositorios/I[NomeEntidade]Repository.cs`
 
 **Caso 1: Entidade usa APENAS métodos básicos**
 
 ```csharp
-namespace ProjSub.Dominio.Repositorios;
+namespace PortalAle.Domain.Repositorios;
 
 /// <summary>
 /// Repositório para TipoConfiguracao (usa apenas métodos básicos).
@@ -212,7 +212,7 @@ public interface ITipoConfiguracaoRepository : IRepository<TipoConfiguracao>
 **Caso 2: Entidade possui métodos específicos**
 
 ```csharp
-namespace ProjSub.Dominio.Repositorios;
+namespace PortalAle.Domain.Repositorios;
 
 /// <summary>
 /// Repositório para Projeto com métodos específicos.
@@ -244,7 +244,7 @@ public interface IProjetoRepository : IRepository<Projeto>
 
 ### Passo 3: Implementar Repositório Concreto (Se Necessário)
 
-**Localização:** `ProjSub.Infraestrutura/Persistencia/Repositorios/[NomeEntidade]Repository.cs`
+**Localização:** `PortalAle.Data.SqlServer/Persistencia/Repositorios/[NomeEntidade]Repository.cs`
 
 **⚠️ Importante:** Apenas criar classe concreta se a entidade **possui métodos específicos**.
 
@@ -261,10 +261,10 @@ public interface IProjetoRepository : IRepository<Projeto>
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
-using ProjSub.Dominio;
-using ProjSub.Dominio.Repositorios;
+using PortalAle.Domain;
+using PortalAle.Domain.Repositorios;
 
-namespace ProjSub.Infraestrutura.Persistencia.Repositorios;
+namespace PortalAle.Data.SqlServer.Persistencia.Repositorios;
 
 /// <summary>
 /// Repositório para Projeto com métodos específicos.
@@ -308,7 +308,7 @@ public class ProjetoRepository : Repository<Projeto>, IProjetoRepository
 
 ### Passo 4: Registro Automático (Não Requere Ação)
 
-O sistema já possui registro automático de repositórios em `ProjSub.Infraestrutura/DependencyInjection.cs`:
+O sistema já possui registro automático de repositórios em `PortalAle.Data.SqlServer/DependencyInjection.cs`:
 
 ```csharp
 // Registro automático de repositórios
@@ -441,7 +441,7 @@ Task<bool> ExisteAsync(int id, CancellationToken ct = default);
 ### Checklist de Implementação
 
 - [ ] **Aggregate Root identificado:** Entidade é raiz de agregação (não é entidade filha)
-- [ ] **Interface criada:** `I[NomeEntidade]Repository` em `ProjSub.Dominio/Repositorios/`
+- [ ] **Interface criada:** `I[NomeEntidade]Repository` em `PortalAle.Domain/Repositorios/`
 - [ ] **Interface herda IRepository<T>:** Todas as interfaces herdam de `IRepository<T>`
 - [ ] **Métodos específicos documentados:** XML comments em todos os métodos customizados
 - [ ] **Classe concreta criada (se necessário):** Apenas se houver métodos específicos

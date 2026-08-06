@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PortalAle.Domain.Clientes;
+using PortalAle.Domain.Contratos;
+using PortalAle.Domain.GruposEconomicos;
 
 namespace PortalAle.Data.SqlServer;
 
@@ -11,6 +13,10 @@ namespace PortalAle.Data.SqlServer;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<Cliente> Clientes => Set<Cliente>();
+
+    public DbSet<GrupoEconomico> GruposEconomicos => Set<GrupoEconomico>();
+
+    public DbSet<Contrato> Contratos => Set<Contrato>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

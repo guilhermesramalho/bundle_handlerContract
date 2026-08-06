@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\PortalAle.Application\PortalAle.Application.csproj" />
-    <ProjectReference Include="..\PortalAle.Data\PortalAle.Data.csproj" />
-    <ProjectReference Include="..\PortalAle.Data.SqlServer\PortalAle.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\GestaoContratoAle.Application\GestaoContratoAle.Application.csproj" />
+    <ProjectReference Include="..\GestaoContratoAle.Data\GestaoContratoAle.Data.csproj" />
+    <ProjectReference Include="..\GestaoContratoAle.Data.SqlServer\GestaoContratoAle.Data.SqlServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

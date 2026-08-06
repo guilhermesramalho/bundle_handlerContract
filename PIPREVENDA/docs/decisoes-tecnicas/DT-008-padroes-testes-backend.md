@@ -14,7 +14,7 @@
 
 ## Contexto
 
-O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, Infraestrutura, WebAPI), usando CQRS, Result Pattern e integrações com sistemas externos (AIDA, APIM, SharePoint). A equipe identificou os seguintes desafios relacionados à estratégia de testes:
+O backend PortalAle é construído com Clean Architecture (Domain, Application, Data, Api), usando CQRS, Result Pattern e integrações com sistemas externos (ver skills `integracao-sap`/`integracao-elaw` para os contratos específicos do PIPREVENDA-1680). A equipe identificou os seguintes desafios relacionados à estratégia de testes:
 
 1. **Complexidade de testes de integração**: Configuração de infraestrutura (banco de dados, mocks de APIs externas) aumenta significativamente o tempo de implementação e manutenção
 2. **Dependências externas**: Testes que dependem de serviços externos (AIDA, APIM) são frágeis e lentos
@@ -48,7 +48,7 @@ O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, 
 
 ## Estratégia de Testes por Camada
 
-### 1. **ProjSub.Dominio**
+### 1. **PortalAle.Domain**
 
 **Escopo:**
 
@@ -69,7 +69,7 @@ O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, 
 
 ---
 
-### 2. **ProjSub.Aplicacao**
+### 2. **PortalAle.Application**
 
 **Escopo:**
 
@@ -89,7 +89,7 @@ O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, 
 
 ---
 
-### 3. **ProjSub.Infraestrutura**
+### 3. **PortalAle.Data**
 
 #### 3.1. **Serviços de Integração - AIDA**
 
@@ -194,7 +194,7 @@ O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, 
 
 ---
 
-### 4. **ProjSub.WebAPI**
+### 4. **PortalAle.Api**
 
 #### 4.1. **Segurança**
 
@@ -295,15 +295,15 @@ O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, 
 
 | Projeto                    | Componentes Testados             | Tipo de Teste    | Framework           | Cobertura Mínima | Status                                 |
 | -------------------------- | -------------------------------- | ---------------- | ------------------- | ---------------- | -------------------------------------- |
-| **ProjSub.Dominio**        | Entidades, serviços, validações  | Unitário         | MSTest, Moq, Faker  | 70%              | ✅ Implementar                         |
-| **ProjSub.Aplicacao**      | CommandHandlers, utilitários     | Unitário         | MSTest, Moq, Faker  | 70%              | ✅ Implementar                         |
-| **ProjSub.Infraestrutura** | Serviços AIDA, APIM, utilitários | Unitário (mocks) | MSTest, Moq, Faker  | 70%              | ✅ Implementar                         |
-| **ProjSub.Infraestrutura** | Repositórios                     | -                | -                   | N/A              | ❌ Não testado                         |
-| **ProjSub.Infraestrutura** | HealthChecks, Scripts SQL        | -                | -                   | N/A              | ❌ Não testado                         |
-| **ProjSub.WebAPI**         | Middleware, Extensions           | Unitário         | MSTest, Moq         | 70%              | ✅ Implementar                         |
-| **ProjSub.WebAPI**         | Segurança                        | Unitário         | MSTest, Moq         | 70%              | ⚠️ Desativado (aguardando refatoração) |
-| **ProjSub.WebAPI**         | Endpoints                        | Arquitetura      | MSTest, NetArchTest | N/A              | 🔧 Arquiteto                           |
-| **ProjSub.WebAPI**         | DTOs, Program.cs                 | -                | -                   | N/A              | ❌ Não testado                         |
+| **PortalAle.Domain**        | Entidades, serviços, validações  | Unitário         | MSTest, Moq, Faker  | 70%              | ✅ Implementar                         |
+| **PortalAle.Application**      | CommandHandlers, utilitários     | Unitário         | MSTest, Moq, Faker  | 70%              | ✅ Implementar                         |
+| **PortalAle.Data** | Serviços AIDA, APIM, utilitários | Unitário (mocks) | MSTest, Moq, Faker  | 70%              | ✅ Implementar                         |
+| **PortalAle.Data** | Repositórios                     | -                | -                   | N/A              | ❌ Não testado                         |
+| **PortalAle.Data** | HealthChecks, Scripts SQL        | -                | -                   | N/A              | ❌ Não testado                         |
+| **PortalAle.Api**         | Middleware, Extensions           | Unitário         | MSTest, Moq         | 70%              | ✅ Implementar                         |
+| **PortalAle.Api**         | Segurança                        | Unitário         | MSTest, Moq         | 70%              | ⚠️ Desativado (aguardando refatoração) |
+| **PortalAle.Api**         | Endpoints                        | Arquitetura      | MSTest, NetArchTest | N/A              | 🔧 Arquiteto                           |
+| **PortalAle.Api**         | DTOs, Program.cs                 | -                | -                   | N/A              | ❌ Não testado                         |
 
 ---
 
@@ -344,7 +344,7 @@ O backend ProjSub é construído com Clean Architecture (Domínio, Aplicação, 
 **Desvantagens:**
 
 - Equipe já familiarizada com MSTest
-- Necessidade de migração de testes existentes (ProjSub.WebAPITestes usa MSTest)
+- Necessidade de migração de testes existentes (PortalAle.Api.Tests usa MSTest)
 - Integração com Visual Studio menos nativa que MSTest
 - MSTest é framework oficial da Microsoft
 
@@ -381,11 +381,11 @@ Os testes devem ser estruturados de forma a espelhar a estrutura de pastas do pr
 Os projetos de teste já existem na solução. Estrutura atual:
 
 ```
-ProjSub/
-├── ProjSub.DominioTestes/           # Testes unitários de entidades/domínio
+src/
+├── PortalAle.Domain.Tests/           # Testes unitários de entidades/domínio
 │   ├── Enums/
 │   │   └── TipoInformacaoCodigoTests.cs
-│   └── ProjSub.DominioTestes.csproj
+│   └── PortalAle.Domain.Tests.csproj
 │   ├── ProjetoTests.cs              # Testa Projeto.cs
 │   ├── StatusTests.cs               # Testa Status.cs
 │   ├── FaseTests.cs                 # Testa Fase.cs
@@ -394,8 +394,8 @@ ProjSub/
 │   ├── Base/
 │       └── EntityTests.cs           # Testa Entity.cs base
 │
-├── ProjSub.AplicacaoTestes/         # Testes unitários de handlers/aplicação
-│   └── ProjSub.AplicacaoTestes.csproj
+├── PortalAle.Application.Tests/         # Testes unitários de handlers/aplicação
+│   └── PortalAle.Application.Tests.csproj
 │   ├── Projetos/
 │   │   ├── Criar/
 │   │   │   └── CriarProjetoCommandHandlerTests.cs
@@ -411,12 +411,12 @@ ProjSub/
 │   ├── Contextos/
 │   └── GerenciaXArea/
 │
-├── ProjSub.InfraestruturaTestes/    # Testes unitários de serviços/infraestrutura
+├── PortalAle.Data.Tests/    # Testes unitários de serviços/infraestrutura
 │   ├── Repositorios/
 │   │   └── ProjetoRepositoryTests.cs  # (repositórios NÃO testados por decisão)
 │   ├── Services/
 │   │   └── ContextValidationServiceTests.cs
-│   └── ProjSub.InfraestruturaTestes.csproj
+│   └── PortalAle.Data.Tests.csproj
 │   ├── Services/
 │   │   ├── AidaConnectionServiceTests.cs      # Mock de conexão AIDA
 │   │   ├── AidaProjetoServiceTests.cs         # Mock de integração AIDA
@@ -424,13 +424,13 @@ ProjSub/
 │   │   ├── SincronizacaoAidaProjetosServiceTests.cs
 │   │   └── AwsSecretsServiceTests.cs          # Mock de AWS Secrets
 │
-└── ProjSub.WebAPITestes/            # Testes de endpoints/WebAPI/integração
+└── PortalAle.Api.Tests/            # Testes de endpoints/WebAPI/integração
     ├── Endpoints/
     │   ├── AuthEndpointsTests.cs
     │   └── ProjetosEndpointsTests.cs
     ├── Seguranca/
     │   └── PermissionUtilsTests.cs
-    └── ProjSub.WebAPITestes.csproj
+    └── PortalAle.Api.Tests.csproj
     ├── Endpoints/           # Testes ARQUITETURAIS
     │   ├── StatusEndpointsTests.cs
     │   ├── FasesEndpointsTests.cs
@@ -448,10 +448,10 @@ ProjSub/
 **Observações:**
 
 - **IMPORTANTE**: A estrutura de testes deve espelhar exatamente a organização do código de produção:
-  - `ProjSub.DominioTestes/` → espelha `ProjSub.Dominio/` (entidades na raiz, pastas Base/, Enums/)
-  - `ProjSub.AplicacaoTestes/` → espelha `ProjSub.Aplicacao/` (por domínio/operação: Projetos/Criar/, etc.)
-  - `ProjSub.InfraestruturaTestes/` → espelha `ProjSub.Infraestrutura/` (Services/, Repositorios/)
-  - `ProjSub.WebAPITestes/` → espelha `ProjSub.WebAPI/` (Endpoints/, Seguranca/, Extensions/)
+  - `PortalAle.Domain.Tests/` → espelha `PortalAle.Domain/` (entidades na raiz, pastas Base/, Enums/)
+  - `PortalAle.Application.Tests/` → espelha `PortalAle.Application/` (por domínio/operação: Projetos/Criar/, etc.)
+  - `PortalAle.Data.Tests/` → espelha `PortalAle.Data/` (Services/, Repositorios/)
+  - `PortalAle.Api.Tests/` → espelha `PortalAle.Api/` (Endpoints/, Seguranca/, Extensions/)
 - Testes de repositórios existem mas NÃO devem ser expandidos (conforme decisão na seção 3.3)
 - QueryHandlers NÃO devem ser testados (conforme decisão na seção 2)
 
@@ -785,7 +785,7 @@ public async Task ObterUsuariosAtivosAsync_ComUsuariosAtivos_DeveRetornarLista()
 dotnet test
 
 # Executar testes de um projeto específico
-dotnet test ProjSub.DominioTestes
+dotnet test PortalAle.Domain.Tests
 
 # Executar com verbosidade detalhada
 dotnet test --verbosity detailed
@@ -824,10 +824,10 @@ Use este checklist para auditar se a estratégia de testes está sendo seguida c
 
 ### Cobertura
 
-- [ ] **ProjSub.Dominio**: Cobertura ≥ 70%
-- [ ] **ProjSub.Aplicacao**: Cobertura ≥ 70% (CommandHandlers testados, QueryHandlers NÃO testados)
-- [ ] **ProjSub.Infraestrutura**: Cobertura ≥ 70% (excluindo repositórios, health checks, migrations)
-- [ ] **ProjSub.WebAPI**: Cobertura ≥ 70% (excluindo DTOs, Program.cs, segurança temporariamente)
+- [ ] **PortalAle.Domain**: Cobertura ≥ 70%
+- [ ] **PortalAle.Application**: Cobertura ≥ 70% (CommandHandlers testados, QueryHandlers NÃO testados)
+- [ ] **PortalAle.Data**: Cobertura ≥ 70% (excluindo repositórios, health checks, migrations)
+- [ ] **PortalAle.Api**: Cobertura ≥ 70% (excluindo DTOs, Program.cs, segurança temporariamente)
 
 ### Qualidade
 

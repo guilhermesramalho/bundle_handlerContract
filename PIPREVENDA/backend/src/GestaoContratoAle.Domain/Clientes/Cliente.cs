@@ -1,5 +1,6 @@
 using PortalAle.Domain.Base;
 using PortalAle.Domain.Exceptions;
+using PortalAle.Domain.GruposEconomicos;
 
 namespace PortalAle.Domain.Clientes;
 
@@ -15,6 +16,16 @@ public class Cliente : Entity
     public string Endereco { get; private set; } = string.Empty;
 
     public bool Ativo { get; private set; }
+
+    /// <summary>Número SAP do cliente (10 dígitos) — identifica o cliente, distinto de PCR/PCF (contexto seção 9). Nullable: nem todo cliente tem SAP ainda (integração bloqueada, Fase 5).</summary>
+    public string? NrSap { get; private set; }
+
+    /// <summary>UF do CNPJ/ponto de venda. Nullable: endereço hoje é texto livre, preenchimento estruturado é incremental.</summary>
+    public string? Uf { get; private set; }
+
+    public int? GrupoEconomicoId { get; private set; }
+
+    public virtual GrupoEconomico? GrupoEconomico { get; private set; }
 
     public DateTimeOffset DataCriacao { get; private set; }
 
@@ -57,6 +68,41 @@ public class Cliente : Entity
         Endereco = endereco.Trim();
         Ativo = ativo;
         DataAlteracao = DateTimeOffset.UtcNow;
+    }
+
+    /// <summary>
+    /// Preenche/atualiza os dados complementares do cliente (SAP, UF, grupo econômico) —
+    /// mutação separada do construtor rico porque, diferente de Nome/Cnpj/Endereco,
+    /// estes campos nascem vazios (não fazem parte da criação original de Cliente) e são
+    /// preenchidos progressivamente pelo cadastro manual de GrupoEconomico (Fase 1.1) e,
+    /// no futuro, pela integração SAP (Fase 5).
+    /// </summary>
+    public void AtribuirDadosComplementares(string? nrSap, string? uf, int? grupoEconomicoId)
+    {
+        GarantirNaoExcluido();
+
+        if (!string.IsNullOrWhiteSpace(nrSap))
+            ValidarNrSap(nrSap);
+
+        if (!string.IsNullOrWhiteSpace(uf))
+            ValidarUf(uf);
+
+        NrSap = string.IsNullOrWhiteSpace(nrSap) ? null : SomenteDigitos(nrSap);
+        Uf = string.IsNullOrWhiteSpace(uf) ? null : uf.Trim().ToUpperInvariant();
+        GrupoEconomicoId = grupoEconomicoId;
+        DataAlteracao = DateTimeOffset.UtcNow;
+    }
+
+    private static void ValidarNrSap(string nrSap)
+    {
+        if (SomenteDigitos(nrSap).Length != 10)
+            throw new DomainException("NrSap: O número SAP do cliente deve ter 10 dígitos");
+    }
+
+    private static void ValidarUf(string uf)
+    {
+        if (uf.Trim().Length != 2)
+            throw new DomainException("Uf: A UF deve ter 2 caracteres");
     }
 
     public void ExcluirLogicamente()

@@ -12,7 +12,7 @@
 
 ## Contexto
 
-O projeto backend (+Digital A11732) é desenvolvido em **C# / .NET 9** com múltiplos desenvolvedores contribuindo simultaneamente. Sem convenções de código claras e ferramentas de aplicação automática, o código tende a apresentar:
+O projeto backend PortalAle (PIPREVENDA-1680) é desenvolvido em **C# / .NET 9** com múltiplos desenvolvedores contribuindo simultaneamente. Sem convenções de código claras e ferramentas de aplicação automática, o código tende a apresentar:
 
 - **Inconsistência** de nomenclatura (PascalCase vs camelCase)
 - **Estilos de formatação** divergentes (indentação, chaves, espaçamento)
@@ -129,14 +129,14 @@ git config core.hooksPath .husky
 .\scripts\format-code.ps1
 
 # Ou usando dotnet CLI
-dotnet format ProjSub/ProjSub.sln
+dotnet format GestaoContratoAle.sln
 ```
 
 ### Passo 3: Análise Local (Antes de Push)
 
 ```powershell
 # Build com análise
-dotnet build ProjSub/ProjSub.sln /p:EnforceCodeStyleInBuild=true
+dotnet build GestaoContratoAle.sln /p:EnforceCodeStyleInBuild=true
 
 # Análise SonarQube local
 .\scripts\run-sonar-analysis.ps1 -ServerUrl "https://sonar.petrobras.com.br" -Token "seu-token"

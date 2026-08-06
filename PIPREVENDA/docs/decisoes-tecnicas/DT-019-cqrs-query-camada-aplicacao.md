@@ -166,7 +166,7 @@ O padrão correto é sempre usar `I{Entidade}Queries`, conforme detalhado na se�
 ### 1. Estrutura de Pastas
 
 ```
-ProjSub.Aplicacao/                          # Camada de Aplicação
+PortalAle.Application/                          # Camada de Aplicação
 ├── Base/
 │   ├── IRequest.cs
 │   ├── IQuery.cs
@@ -188,12 +188,12 @@ ProjSub.Aplicacao/                          # Camada de Aplicação
         ├── ListarProjetosQueryHandler.cs
         └── ListarProjetosResponse.cs
 
-ProjSub.Aplicacao/
+PortalAle.Application/
 └── SolicitacoesAcesso/
     ├── ISolicitacaoAcessoQueries.cs        # Interface de Query (no agregado)
     └── ...
 
-ProjSub.Infraestrutura/                     # Camada de Infraestrutura
+PortalAle.Data/                     # Camada de Infraestrutura
 ├── Persistencia/
 │   ├── ApplicationDbContext.cs
 │   ├── Configuracoes/
@@ -216,7 +216,7 @@ ProjSub.Infraestrutura/                     # Camada de Infraestrutura
 
 ### 2. Definir Interface de Query (Application)
 
-**Arquivo:** `ProjSub.Aplicacao/Projetos/IProjetoQueries.cs`
+**Arquivo:** `PortalAle.Application/Projetos/IProjetoQueries.cs`
 
 Este documento aceita **duas estratégias válidas** para contratos de consulta na Application:
 
@@ -226,11 +226,11 @@ Este documento aceita **duas estratégias válidas** para contratos de consulta 
 Ambas as opções são válidas; a escolha deve considerar coesão e complexidade do agregado/caso de uso.
 
 ```csharp
-using ProjSub.Aplicacao.Projetos.Consultar;
-using ProjSub.Aplicacao.Projetos.Listar;
-using ProjSub.Aplicacao.Base;
+using PortalAle.Application.Projetos.Consultar;
+using PortalAle.Application.Projetos.Listar;
+using PortalAle.Application.Base;
 
-namespace ProjSub.Aplicacao.Projetos;
+namespace PortalAle.Application.Projetos;
 
 /// <summary>
 /// Contrato de consultas (read-only) para Projetos.
@@ -274,7 +274,7 @@ public interface IProjetoQueries : IQuery
 **Exemplo alternativo por caso de uso:**
 
 ```csharp
-namespace ProjSub.Aplicacao.Projetos.Listar;
+namespace PortalAle.Application.Projetos.Listar;
 
 public interface IListarProjetosQuery : IQuery
 {
@@ -288,13 +288,13 @@ public interface IListarProjetosQuery : IQuery
 
 ### 3. QueryHandler Usando a Interface (Application)
 
-**Arquivo:** `ProjSub.Aplicacao/Projetos/Consultar/ConsultarProjetoQueryHandler.cs`
+**Arquivo:** `PortalAle.Application/Projetos/Consultar/ConsultarProjetoQueryHandler.cs`
 
 ```csharp
-using ProjSub.Aplicacao.Base;
-using ProjSub.Aplicacao.Projetos;
+using PortalAle.Application.Base;
+using PortalAle.Application.Projetos;
 
-namespace ProjSub.Aplicacao.Projetos.Consultar;
+namespace PortalAle.Application.Projetos.Consultar;
 
 public class ConsultarProjetoQueryHandler
     : IQueryHandler<ConsultarProjetoRequest, ConsultarProjetoResponse>
@@ -358,17 +358,17 @@ public record ListarProjetosRequest : PaginationRequest, ISortableRequest
 
 ### 4. Implementação Concreta (Infrastructure)
 
-**Arquivo:** `ProjSub.Infraestrutura/Persistencia/Queries/ProjetoQueries.cs`
+**Arquivo:** `PortalAle.Data.SqlServer/Persistencia/Queries/ProjetoQueries.cs`
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
-using ProjSub.Aplicacao.Projetos;
-using ProjSub.Aplicacao.Projetos.Consultar;
-using ProjSub.Aplicacao.Projetos.Listar;
-using ProjSub.Aplicacao.Base;
-using ProjSub.Infraestrutura.Persistencia.Extensions;
+using PortalAle.Application.Projetos;
+using PortalAle.Application.Projetos.Consultar;
+using PortalAle.Application.Projetos.Listar;
+using PortalAle.Application.Base;
+using PortalAle.Data.SqlServer.Persistencia.Extensions;
 
-namespace ProjSub.Infraestrutura.Persistencia.Queries;
+namespace PortalAle.Data.SqlServer.Persistencia.Queries;
 
 public class ProjetoQueries : IProjetoQueries
 {
@@ -467,10 +467,10 @@ public class ProjetoQueries : IProjetoQueries
 
 ### 5. Registro no DI (WebAPI)
 
-**Arquivo:** `ProjSub.WebAPI/Program.cs` ou `ProjSub.Infraestrutura/DependencyInjection.cs`
+**Arquivo:** `PortalAle.Api/Program.cs` ou `PortalAle.Data.SqlServer/DependencyInjection.cs`
 
 ```csharp
-using ProjSub.Aplicacao.Base;
+using PortalAle.Application.Base;
 
 // Registrar automaticamente implementações de interfaces que herdam de IQuery
 services.AddScopedFromInterface(typeof(IQuery));
@@ -509,12 +509,12 @@ Esse padrão mantém a aplicação orientada a contrato e desacoplada da impleme
 **Interfaces:**
 
 - `I{Entidade}Queries` (ex: `IProjetoQueries`, `ISolicitacaoAcessoQueries`)
-- Localização: `ProjSub.Aplicacao/{Entidade}/` (ex: `ProjSub.Aplicacao/Projetos/IProjetoQueries.cs`)
+- Localização: `PortalAle.Application/{Entidade}/` (ex: `PortalAle.Application/Projetos/IProjetoQueries.cs`)
 
 **Implementações:**
 
 - `{Entidade}Queries` (ex: `ProjetoQueries`, `SolicitacaoAcessoQueries`)
-- Localização: `ProjSub.Infraestrutura/Persistencia/Queries/`
+- Localização: `PortalAle.Data.SqlServer/Persistencia/Queries/`
 
 **Métodos:**
 
@@ -622,7 +622,7 @@ Use este checklist para implementar e auditar se os padrões estão sendo seguid
 
 ### Interfaces de Query (Application)
 
-- [ ] Interface `I{Entidade}Queries` criada em `ProjSub.Aplicacao/{Entidade}/` (ex: `Projetos/IProjetoQueries.cs`)
+- [ ] Interface `I{Entidade}Queries` criada em `PortalAle.Application/{Entidade}/` (ex: `Projetos/IProjetoQueries.cs`)
 - [ ] Ou interface específica por caso de uso (ex: `Projetos/Listar/IListarProjetosQuery.cs`)
 - [ ] Requests de query definidos como `record` e usando `IRequest`
 - [ ] Não usar `ICommand`/`IQuery` como contrato de request
@@ -637,7 +637,7 @@ Use este checklist para implementar e auditar se os padrões estão sendo seguid
 
 ### Implementação de Query (Infrastructure)
 
-- [ ] Implementação criada em `ProjSub.Infraestrutura/Persistencia/Queries/`
+- [ ] Implementação criada em `PortalAle.Data.SqlServer/Persistencia/Queries/`
 - [ ] Implementação em classe `{Entidade}Queries` **ou** em repositório do agregado (ex.: `ProjetoRepositorio`)
 - [ ] Classe de implementação (query ou repositório) implementa `I{Entidade}Queries` e/ou interface específica (ex.: `IListarProjetosQuery`)
 - [ ] Injeta `ApplicationDbContext` no construtor

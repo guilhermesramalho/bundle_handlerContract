@@ -109,7 +109,7 @@ Adotar padrão **Command Handler** na camada de Aplicação com as seguintes dir
 ### 1. Estrutura de Pastas
 
 ```
-ProjSub.Aplicacao/
+PortalAle.Application/
 ├── Base/
 │   ├── IRequest.cs                         # Interface base para Requests
 │   ├── ICommandHandler.cs                  # Interface base para Handlers
@@ -129,7 +129,7 @@ ProjSub.Aplicacao/
         ├── ExcluirProjetoCommand.cs
         └── ExcluirProjetoCommandHandler.cs
 
-ProjSub.Infraestrutura/
+PortalAle.Data/
 └── Persistencia/
     ├── ApplicationDbContext.cs
     └── Repositorios/
@@ -147,12 +147,12 @@ ProjSub.Infraestrutura/
 
 ### 2. Request (Escrita)
 
-**Arquivo:** `ProjSub.Aplicacao/Projetos/Criar/CriarProjetoRequest.cs`
+**Arquivo:** `PortalAle.Application/Projetos/Criar/CriarProjetoRequest.cs`
 
 ```csharp
-using ProjSub.Aplicacao.Base;
+using PortalAle.Application.Base;
 
-namespace ProjSub.Aplicacao.Projetos.Criar;
+namespace PortalAle.Application.Projetos.Criar;
 
 /// <summary>
 /// Request de escrita para criar um novo projeto.
@@ -177,15 +177,15 @@ public record CriarProjetoRequest(
 
 ### 3. CommandHandler (Use Case)
 
-**Arquivo:** `ProjSub.Aplicacao/Projetos/Criar/CriarProjetoCommandHandler.cs`
+**Arquivo:** `PortalAle.Application/Projetos/Criar/CriarProjetoCommandHandler.cs`
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
-using ProjSub.Aplicacao.Base;
-using ProjSub.Aplicacao.Projetos;
-using ProjSub.Dominio.Projetos;
+using PortalAle.Application.Base;
+using PortalAle.Application.Projetos;
+using PortalAle.Domain.Projetos;
 
-namespace ProjSub.Aplicacao.Projetos.Criar;
+namespace PortalAle.Application.Projetos.Criar;
 
 public class CriarProjetoCommandHandler
     : ICommandHandler<CriarProjetoRequest, CriarProjetoResponse>
@@ -291,10 +291,10 @@ public class CriarProjetoCommandHandler
 
 ### 4. Response
 
-**Arquivo:** `ProjSub.Aplicacao/Projetos/Criar/CriarProjetoResponse.cs`
+**Arquivo:** `PortalAle.Application/Projetos/Criar/CriarProjetoResponse.cs`
 
 ```csharp
-namespace ProjSub.Aplicacao.Projetos.Criar;
+namespace PortalAle.Application.Projetos.Criar;
 
 /// <summary>
 /// Response da operação de criação de projeto.
@@ -410,7 +410,7 @@ public class AprovarSolicitacaoCommandHandler
 
 ### 8. Uso em MinimalAPI Endpoint
 
-**Arquivo:** `ProjSub.WebAPI/Endpoints/ProjetosEndpoints.cs`
+**Arquivo:** `PortalAle.Api/Endpoints/ProjetosEndpoints.cs`
 
 ```csharp
 public static class ProjetosEndpoints
@@ -480,7 +480,7 @@ public static class ProjetosEndpoints
 - Classe Request: `{Ação}{Entidade}Request` (ex: `CriarProjetoRequest`, `AprovarSolicitacaoRequest`)
 - Classe Handler: `{Ação}{Entidade}CommandHandler` (**obrigatório** sufixo `CommandHandler`)
 - Classe Response: `{Ação}{Entidade}Response`
-- Namespace: `ProjSub.Aplicacao.{Entidade}.{Ação}`
+- Namespace: `PortalAle.Application.{Entidade}.{Ação}`
 
 ### 2. Validações em Camadas
 
@@ -716,7 +716,7 @@ Use este checklist para implementar e auditar se os padrões estão sendo seguid
 - [ ] Implementa `IRequest<Result<TResponse>>` (ou `IRequest<Result>`)
 - [ ] Contém apenas propriedades de entrada (sem lógica)
 - [ ] Propriedades com nomes descritivos do negócio
-- [ ] Namespace: `ProjSub.Aplicacao.{Entidade}.{Ação}`
+- [ ] Namespace: `PortalAle.Application.{Entidade}.{Ação}`
 
 ### CommandHandler (Use Case)
 

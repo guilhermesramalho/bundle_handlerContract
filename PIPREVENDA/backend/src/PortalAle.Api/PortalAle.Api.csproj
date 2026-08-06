@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PortalAle.IoC\PortalAle.IoC.csproj" />
+    <ProjectReference Include="..\GestaoContratoAle.IoC\GestaoContratoAle.IoC.csproj" />
   </ItemGroup>
 
 </Project>

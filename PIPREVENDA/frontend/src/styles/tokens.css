@@ -1,0 +1,255 @@
+/* ALE Design System — tokens de design
+   Extraído de docs/modelo-frontend/prototipo.html (Figma Variables + tokens
+   semânticos). Ver PLANO-IMPLEMENTACAO-FRONTEND.md, Fase F0. Não editar à
+   mão sem atualizar também o protótipo de origem, senão os dois divergem. */
+
+/* ---------------------------------------------------------------------- */
+/* 1. Tokens primitivos (Figma Variables — cores, raio, espaçamento cru)   */
+/* ---------------------------------------------------------------------- */
+:root {
+  --auxiliar-color-blue-auxiliar-blue-dark: rgb(1,48,75);
+  --auxiliar-color-blue-auxiliar-blue-light: rgb(150,201,230);
+  --auxiliar-color-blue-auxiliar-blue-medium: rgb(0,87,137);
+  --auxiliar-color-blue-auxiliar-blue-pure: rgb(0,124,195);
+  --auxiliar-color-cian-auxiliar-cian-dark: rgb(0,77,86);
+  --auxiliar-color-cian-auxiliar-cian-light: rgb(150,225,234);
+  --auxiliar-color-cian-auxiliar-cian-medium: rgb(0,127,142);
+  --auxiliar-color-cian-auxiliar-cian-pure: rgb(0,182,203);
+  --auxiliar-color-green-auxiliar-green-dark: rgb(42,95,37);
+  --auxiliar-color-green-auxiliar-green-light: rgb(184,226,180);
+  --auxiliar-color-green-auxiliar-green-medium: rgb(46,153,35);
+  --auxiliar-color-green-auxiliar-green-pure: rgb(82,185,72);
+  --auxiliar-color-olive-auxiliar-olive-dark: rgb(95,102,23);
+  --auxiliar-color-olive-auxiliar-olive-light: rgb(237,242,182);
+  --auxiliar-color-olive-auxiliar-olive-medium: rgb(147,158,17);
+  --auxiliar-color-olive-auxiliar-olive-pure: rgb(219,228,107);
+  --auxiliar-color-orange-auxiliar-orange-dark: rgb(108,60,21);
+  --auxiliar-color-orange-auxiliar-orange-light: rgb(250,207,171);
+  --auxiliar-color-orange-auxiliar-orange-medium: rgb(171,96,35);
+  --auxiliar-color-orange-auxiliar-orange-pure: rgb(244,137,50);
+  --auxiliar-color-violet-auxiliar-violet-dark: rgb(49,45,74);
+  --auxiliar-color-violet-auxiliar-violet-light: rgb(198,194,220);
+  --auxiliar-color-violet-auxiliar-violet-medium: rgb(82,74,119);
+  --auxiliar-color-violet-auxiliar-violet-pure: rgb(117,106,170);
+
+  --border-width-hairline: 1;
+  --border-width-heavy: 8;
+  --border-width-none: 0;
+  --border-width-thick: 4;
+  --border-width-thin: 2;
+
+  --corner-radius-circular: 500;
+  --corner-radius-lg: 12;
+  --corner-radius-md: 8;
+  --corner-radius-none: 0;
+  --corner-radius-pill: 500;
+  --corner-radius-sm: 4;
+  --corner-radius-xl: 16;
+
+  --helper-color-error-error-dark: rgb(129,29,68);
+  --helper-color-error-error-light: rgb(237,170,196);
+  --helper-color-error-error-medium: rgb(211,47,111);
+  --helper-color-error-error-pure: rgb(218,82,135);
+  --helper-color-success-success-dark: rgb(0,101,46);
+  --helper-color-success-success-light: rgb(207,250,200);
+  --helper-color-success-success-medium: rgb(98,184,94);
+  --helper-color-success-success-pure: rgb(40,133,66);
+  --helper-color-warning-warning-dark: rgb(235,152,28);
+  --helper-color-warning-warning-light: rgb(255,240,194);
+  --helper-color-warning-warning-medium: rgb(255,206,71);
+  --helper-color-warning-warning-pure: rgb(250,185,20);
+
+  --layer-opacity-intense: 56;
+  --layer-opacity-light: 16;
+  --layer-opacity-medium: 32;
+  --layer-opacity-semi-opaque: 72;
+  --layer-opacity-semi-transparente: 8;
+
+  --neutral-color-high-dark: rgb(192,195,204);
+  --neutral-color-high-light: rgb(242,244,247);
+  --neutral-color-high-medium: rgb(228,229,235);
+  --neutral-color-high-pure: rgb(255,255,255);
+  --neutral-color-low-dark: rgb(45,46,51);
+  --neutral-color-low-light: rgb(142,145,153);
+  --neutral-color-low-medium: rgb(94,96,102);
+  --neutral-color-low-pure: rgb(0,0,0);
+  --neutral-color-opacity-low-dark-intense: rgba(45,46,51,0.56);
+  --neutral-color-opacity-low-dark-medium: rgba(45,46,51,0.32);
+  --neutral-color-opacity-low-dark-semi-opaque-4: rgba(45,46,51,0.16);
+  --neutral-color-opacity-low-dark-semi-opaque: rgba(45,46,51,0.72);
+  --neutral-color-opacity-low-dark-semi-transparent: rgba(45,46,51,0.08);
+
+  --primary-color-primary-dark: rgb(0,34,67);
+  --primary-color-primary-light: rgb(150,185,218);
+  --primary-color-primary-lighter-2: rgb(230,238,246);
+  --primary-color-primary-lighter: rgb(230,238,246);
+  --primary-color-primary-medium: rgb(0,56,109);
+  --primary-color-primary-pure-2: rgb(0,84,164);
+  --primary-color-primary-pure: rgb(0,84,164);
+
+  --schemes-on-surface-variant: rgb(67,71,80);
+
+  --secondary-color-secondary-dark: rgb(102,18,13);
+  --secondary-color-secondary-light: rgb(248,169,164);
+  --secondary-color-secondary-lighter: rgb(253,234,233);
+  --secondary-color-secondary-medium: rgb(177,30,20);
+  --secondary-color-secondary-pure: rgb(238,46,33);
+
+  --spacing-giant: 200;
+  --spacing-huge: 160;
+  --spacing-lg: 56;
+  --spacing-md: 48;
+  --spacing-nano: 8;
+  --spacing-quarck: 4;
+  --spacing-sm: 40;
+  --spacing-xl: 64;
+  --spacing-xs: 32;
+  --spacing-xxl: 80;
+  --spacing-xxs: 24;
+  --spacing-xxxl: 120;
+  --spacing-xxxs: 16;
+  --spacing-xxxxs: 12;
+
+  --terciary-color-terciary-dark: rgb(153,120,21);
+  --terciary-color-terciary-light: rgb(253,221,127);
+  --terciary-color-terciary-lighter: rgb(255,249,233);
+  --terciary-color-terciary-medium: rgb(217,167,19);
+  --terciary-color-terciary-pure-2: rgb(251,196,34);
+  --terciary-color-terciary-pure: rgb(251,196,34);
+}
+
+:root[data-theme="light"], .light {
+  --schemes-on-surface-variant: rgb(63,67,76);
+}
+
+:root[data-theme="dark"], .dark {
+  --schemes-on-surface-variant: rgb(195,198,209);
+}
+
+/* ---------------------------------------------------------------------- */
+/* 2. Tipografia — famílias e escala tipográfica                          */
+/*    Display = Neo Sans Pro. Body/UI = Lato. Micro = Inter.               */
+/* ---------------------------------------------------------------------- */
+:root {
+  --font-display: 'Neo Sans Pro', 'Segoe UI', system-ui, sans-serif;
+  --font-sans:    'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-ui:      'Inter', 'Lato', -apple-system, system-ui, sans-serif;
+
+  /* Pesos */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold: 600;
+  --weight-bold:    700;
+  --weight-black:   900;
+
+  /* Escala de tamanho (px) */
+  --font-size-nano:  10px;  /* micro labels   */
+  --font-size-xxxs:  12px;  /* caption        */
+  --font-size-xxs:   14px;  /* secondary body */
+  --font-size-xs:    16px;  /* body / default */
+  --font-size-sm:    20px;
+  --font-size-md:    24px;  /* heading        */
+  --font-size-lg:    32px;  /* display        */
+  --font-size-xl:    40px;
+  --font-size-xxl:   48px;
+
+  /* Altura de linha */
+  --line-height-tight:   1.2;
+  --line-height-display: 1.3;
+  --line-height-default: 1.5;
+
+  /* Espaçamento entre letras */
+  --letter-spacing-tight:  -0.01em;
+  --letter-spacing-normal:  0;
+  --letter-spacing-wide:    0.02em;
+
+  /* Tokens compostos por papel (shorthand: weight size/line family) */
+  --text-display-lg: var(--weight-medium) var(--font-size-lg) / var(--line-height-display) var(--font-display);
+  --text-display-md: var(--weight-medium) var(--font-size-md) / var(--line-height-display) var(--font-display);
+  --text-heading-lg: var(--weight-bold) var(--font-size-md) / var(--line-height-display) var(--font-sans);
+  --text-heading-md: var(--weight-bold) var(--font-size-xs) / var(--line-height-default) var(--font-sans);
+  --text-label-lg:   var(--weight-semibold) var(--font-size-xs) / var(--line-height-default) var(--font-sans);
+  --text-label-md:   var(--weight-semibold) var(--font-size-xxs) / var(--line-height-default) var(--font-sans);
+  --text-body-lg:    var(--weight-regular) var(--font-size-xs) / var(--line-height-default) var(--font-sans);
+  --text-body-md:    var(--weight-regular) var(--font-size-xxs) / var(--line-height-default) var(--font-sans);
+  --text-caption:    var(--weight-regular) var(--font-size-xxxs) / var(--line-height-default) var(--font-sans);
+  --text-micro:      var(--weight-medium) var(--font-size-nano) / var(--line-height-default) var(--font-ui);
+}
+
+/* ---------------------------------------------------------------------- */
+/* 3. Tokens semânticos — o que os componentes de fato consomem           */
+/* ---------------------------------------------------------------------- */
+:root {
+  /* Superfícies e texto */
+  --surface-page:        var(--neutral-color-high-light);   /* #F2F4F7 */
+  --surface-card:        var(--neutral-color-high-pure);    /* #FFFFFF */
+  --surface-raised:      var(--neutral-color-high-pure);
+  --surface-sunken:      var(--neutral-color-high-medium);  /* #E4E5EB */
+  --surface-inverse:     var(--primary-color-primary-dark); /* #002243 */
+  --surface-disabled:    var(--neutral-color-high-medium);
+
+  --text-primary:        var(--neutral-color-low-dark);     /* #2D2E33 */
+  --text-secondary:      var(--neutral-color-low-medium);   /* #5E6066 */
+  --text-tertiary:       var(--neutral-color-low-light);    /* #8E9199 */
+  --text-on-brand:       var(--neutral-color-high-pure);    /* #FFFFFF */
+  --text-disabled:       var(--neutral-color-high-dark);    /* #C0C3CC */
+  --text-link:           var(--primary-color-primary-pure); /* #0054A4 */
+
+  /* Marca */
+  --brand-primary:        var(--primary-color-primary-pure);    /* #0054A4 */
+  --brand-primary-hover:  var(--primary-color-primary-medium);  /* #00386D */
+  --brand-primary-press:  var(--primary-color-primary-dark);    /* #002243 */
+  --brand-primary-soft:   var(--primary-color-primary-lighter); /* #E6EEF6 */
+  --brand-secondary:      var(--secondary-color-secondary-pure);/* #EE2E21 */
+  --brand-tertiary:       var(--terciary-color-terciary-pure);  /* #FBC422 */
+
+  /* Bordas */
+  --border-subtle:       var(--neutral-color-high-medium);  /* #E4E5EB */
+  --border-default:      var(--neutral-color-high-dark);    /* #C0C3CC */
+  --border-strong:       var(--neutral-color-low-dark);     /* #2D2E33 */
+  --border-focus:        var(--primary-color-primary-pure); /* #0054A4 */
+
+  /* Feedback (success · warning · error — sem "info") */
+  --feedback-success:      var(--helper-color-success-success-pure);
+  --feedback-success-soft: var(--helper-color-success-success-light);
+  --feedback-warning:      var(--helper-color-warning-warning-pure);
+  --feedback-warning-soft: var(--helper-color-warning-warning-light);
+  --feedback-error:        var(--helper-color-error-error-medium);
+  --feedback-error-soft:   var(--helper-color-error-error-light);
+
+  /* Raio (float → px) */
+  --radius-none: 0;
+  --radius-sm:   calc(var(--corner-radius-sm) * 1px);   /* 4  */
+  --radius-md:   calc(var(--corner-radius-md) * 1px);   /* 8  */
+  --radius-lg:   calc(var(--corner-radius-lg) * 1px);   /* 12 */
+  --radius-xl:   calc(var(--corner-radius-xl) * 1px);   /* 16 */
+  --radius-pill: 500px;
+  --radius-circular: 500px;
+
+  /* Espaçamento (float → px) */
+  --space-quarck: calc(var(--spacing-quarck) * 1px);  /* 4   */
+  --space-nano:   calc(var(--spacing-nano) * 1px);    /* 8   */
+  --space-xxxs:   calc(var(--spacing-xxxs) * 1px);    /* 16  */
+  --space-xxxxs:  calc(var(--spacing-xxxxs) * 1px);   /* 12  */
+  --space-xxs:    calc(var(--spacing-xxs) * 1px);     /* 24  */
+  --space-xs:     calc(var(--spacing-xs) * 1px);      /* 32  */
+  --space-sm:     calc(var(--spacing-sm) * 1px);      /* 40  */
+  --space-md:     calc(var(--spacing-md) * 1px);      /* 48  */
+  --space-lg:     calc(var(--spacing-lg) * 1px);      /* 56  */
+  --space-xl:     calc(var(--spacing-xl) * 1px);      /* 64  */
+  --space-xxl:    calc(var(--spacing-xxl) * 1px);     /* 80  */
+  --space-xxxl:   calc(var(--spacing-xxxl) * 1px);    /* 120 */
+
+  /* Espessura de borda */
+  --stroke-hairline: 1px;
+  --stroke-thin:     2px;
+  --stroke-thick:    4px;
+  --stroke-heavy:    8px;
+
+  /* Elevação — sombras suaves e neutras */
+  --shadow-xs: 0 1px 2px rgba(45,46,51,0.08);
+  --shadow-sm: 0 2px 8px rgba(45,46,51,0.08);
+  --shadow-md: 0 4px 16px rgba(45,46,51,0.10);
+  --shadow-lg: 0 8px 32px rgba(45,46,51,0.12);
+  --shadow-focus-ring: 0 0 0 4px var(--primary-color-primary-lighter);
+}

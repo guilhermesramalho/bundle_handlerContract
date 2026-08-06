@@ -12,7 +12,7 @@
 
 ## Contexto
 
-A API ProjSub necessita de padronização na implementação de endpoints REST para garantir:
+A API PortalAle necessita de padronização na implementação de endpoints REST para garantir:
 
 1. **Conformidade com Clean Architecture**: Endpoints devem atuar apenas como camada de apresentação, delegando processamento para a camada de Aplicação
 2. **Separação de Responsabilidades**: Configuração de rotas separada da lógica de processamento
@@ -32,7 +32,7 @@ Adotamos **Minimal APIs do .NET 9** com as seguintes diretrizes arquiteturais:
 **Organização por Contexto de Negócio:**
 
 ```
-ProjSub.WebAPI/
+PortalAle.Api/
   └── Endpoints/
       ├── ProjetosEndpoints.cs      # Endpoints de Projetos
       ├── RiscosEndpoints.cs        # Endpoints de Riscos
@@ -43,7 +43,7 @@ ProjSub.WebAPI/
 **Estrutura Interna da Classe:**
 
 ```csharp
-namespace ProjSub.WebAPI.Endpoints;
+namespace PortalAle.Api.Endpoints;
 
 public static class ProjetosEndpoints
 {
@@ -386,7 +386,7 @@ private static async Task<IResult> ListarProjetos(
 
 ```csharp
 // ✅ 1. Request já definido na camada de Aplicação
-// ProjSub.Aplicacao/Projetos/Listar/ListarProjetosRequest.cs
+// PortalAle.Application/Projetos/Listar/ListarProjetosRequest.cs
 public record ListarProjetosRequest(
     int Page = 1,
     int PageSize = 10,
@@ -394,7 +394,7 @@ public record ListarProjetosRequest(
     string? Status = null);
 
 // ✅ 2. Reutilizar diretamente no endpoint
-// ProjSub.WebAPI/Endpoints/ProjetosEndpoints.cs
+// PortalAle.Api/Endpoints/ProjetosEndpoints.cs
 private static async Task<IResult> ListarProjetos(
     [AsParameters] ListarProjetosRequest request,
     [FromServices] IQueryHandler<ListarProjetosRequest, ListarProjetosResponse> handler,
@@ -424,7 +424,7 @@ private static async Task<IResult> ListarProjetos(
 
 ```csharp
 // ⚠️ 1. Request específico para API (apenas quando justificável)
-// ProjSub.WebAPI/Endpoints/Projetos/ListarProjetosFiltrosAPIRequest.cs
+// PortalAle.Api/Endpoints/Projetos/ListarProjetosFiltrosAPIRequest.cs
 public record ListarProjetosFiltrosAPIRequest(
     int Page = 1,
     int PageSize = 10,
@@ -472,7 +472,7 @@ private static async Task<IResult> ListarProjetos(
 5. **Legibilidade**: Configuração de rotas separada da lógica facilita compreensão
 6. **Manutenibilidade**: Convenções claras reduzem inconsistências entre endpoints
 7. **RESTful**: Respostas diretas sem envelope seguem padrões REST modernos
-8. **Frontend Friendly**: Dados diretamente no corpo facilitam consumo no Angular
+8. **Frontend Friendly**: Dados diretamente no corpo facilitam consumo no frontend React/Next.js
 
 ### Negativas ❌
 
@@ -493,7 +493,7 @@ private static async Task<IResult> ListarProjetos(
 ### Registro no Program.cs
 
 ```csharp
-// ProjSub.WebAPI/Program.cs
+// PortalAle.Api/Program.cs
 var app = builder.Build();
 
 // Registrar todos os endpoints
