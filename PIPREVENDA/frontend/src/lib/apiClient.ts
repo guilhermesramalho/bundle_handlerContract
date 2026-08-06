@@ -9,7 +9,7 @@ import type { paths } from "@/types/api.generated";
  * mudar (novo endpoint, campo novo, etc.).
  */
 export const apiClient = createClient<paths>({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5080",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5013",
   // Não passar `fetch: globalThis.fetch` direto — isso capturaria a referência
   // no momento da criação do client (import time), antes do MSW substituir
   // `globalThis.fetch` no `beforeAll` dos testes, fazendo toda chamada furar o

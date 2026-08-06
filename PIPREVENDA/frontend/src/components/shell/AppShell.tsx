@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Avatar, Icon, IconButton, Input } from "@/components/ui";
+import { Avatar, Icon, IconButton } from "@/components/ui";
 import styles from "./AppShell.module.css";
 
 const NAV_ITEMS = [
-  { href: "/contratos", label: "Contratos", icon: "description" },
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { href: "/contratos", label: "Contratos" },
+  { href: "/dashboard", label: "Book / Dashboard" },
 ];
 
 function NotificationsDropdown() {
@@ -25,7 +25,13 @@ function NotificationsDropdown() {
 
   return (
     <div className={styles.notifWrap} ref={ref}>
-      <IconButton icon="notifications" type="ghost" aria-label="Notificações" onClick={() => setOpen((o) => !o)} />
+      <IconButton
+        icon="notifications"
+        type="ghost"
+        aria-label="Notificações"
+        onClick={() => setOpen((o) => !o)}
+        style={{ color: "#fff" }}
+      />
       {open && (
         <div className={styles.notifPanel} role="menu">
           <span className={styles.notifTitle}>Notificações</span>
@@ -51,13 +57,16 @@ function GlobalSearch() {
 
   return (
     <form className={styles.search} onSubmit={handleSubmit}>
-      <Input
-        placeholder="Buscar CNPJ, nº SAP, grupo econômico..."
-        leadingIcon="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        aria-label="Busca global de contratos"
-      />
+      <div className={styles.searchWrap}>
+        <Icon name="search" size={20} />
+        <input
+          className={styles.searchInput}
+          placeholder="Buscar CNPJ, razão social, grupo, SAP, PCR/PCF..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Busca global de contratos"
+        />
+      </div>
     </form>
   );
 }
@@ -74,8 +83,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <Link href="/" className={styles.logo}>
-          PIPREVENDA
+        <Link href="/" className={styles.logoLink} aria-label="ALE — página inicial">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-ale.svg" alt="" className={styles.logoImg} />
+          <span className={styles.logoDivider} />
+          <span className={styles.logoLabel} aria-hidden="true">
+            Gestão de Contratos
+          </span>
         </Link>
 
         <nav className={styles.nav}>
@@ -87,12 +101,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 href={item.href}
                 className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
               >
-                <Icon name={item.icon} size={20} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
+
+        <div className={styles.spacer} />
 
         <GlobalSearch />
 

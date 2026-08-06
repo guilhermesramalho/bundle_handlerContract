@@ -187,6 +187,7 @@
   --surface-sunken:      var(--neutral-color-high-medium);  /* #E4E5EB */
   --surface-inverse:     var(--primary-color-primary-dark); /* #002243 */
   --surface-disabled:    var(--neutral-color-high-medium);
+  --surface-header:      var(--primary-color-primary-medium); /* #00386D — barra de navegação principal */
 
   --text-primary:        var(--neutral-color-low-dark);     /* #2D2E33 */
   --text-secondary:      var(--neutral-color-low-medium);   /* #5E6066 */

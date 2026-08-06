@@ -205,7 +205,16 @@ try
         });
     }
 
-    app.UseHttpsRedirection();
+    // Só força HTTPS fora de Development. Em dev a API roda sem certificado
+    // configurado para o frontend confiar, e o launch profile "https" expõe
+    // as duas portas (http+https) — com o redirect incondicional, todo GET
+    // do frontend em localhost:5013 (perfil "http" do launchSettings) vira
+    // um 307 para https://localhost:7030, que quebra o fetch (troca de
+    // origem no meio do caminho) mesmo com CORS liberado. Descoberto
+    // testando a integração de verdade, não em nenhum teste automatizado.
+    if (!app.Environment.IsDevelopment())
+        app.UseHttpsRedirection();
+
     app.UseCors(corsPolicyFrontend);
     app.UseAuthorization();
 

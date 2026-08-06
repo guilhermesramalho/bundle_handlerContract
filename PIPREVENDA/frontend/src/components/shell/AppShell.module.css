@@ -11,58 +11,116 @@
   z-index: 30;
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 20px;
   height: 64px;
-  padding-inline: var(--space-xxs);
-  background: var(--surface-card);
-  border-bottom: 1px solid var(--border-subtle);
+  padding-inline: 24px;
+  background: var(--surface-header);
+  box-shadow: var(--shadow-sm);
 }
 
-.logo {
-  font: var(--text-heading-md);
-  color: var(--brand-primary);
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.logoImg {
+  display: block;
+  height: 24px;
+  width: auto;
+}
+
+.logoDivider {
+  width: 1px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.logoLabel {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.44px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
   white-space: nowrap;
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-xxxs);
+  gap: 4px;
+  margin-left: 8px;
 }
 
 .navLink {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   height: 40px;
-  padding-inline: var(--space-xxxxs);
-  border-radius: var(--radius-sm);
+  padding-inline: 16px;
+  border-radius: 8px;
   font: var(--text-label-lg);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.78);
   text-decoration: none;
+  white-space: nowrap;
   transition: background .15s ease, color .15s ease;
 }
 
 .navLink:hover {
-  background: var(--brand-primary-soft);
-  color: var(--brand-primary);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .navLinkActive {
-  color: var(--brand-primary);
-  background: var(--brand-primary-soft);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.navLinkActive:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.spacer {
+  flex: 1;
 }
 
 .search {
+  flex: 0 1 520px;
+  min-width: 0;
+}
+
+.searchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.searchInput {
   flex: 1;
-  max-width: 420px;
-  margin-inline: auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: var(--text-body-lg);
+  color: #fff;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: var(--space-xxxs);
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .notifWrap {
@@ -110,4 +168,8 @@
 
 .main {
   flex: 1;
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding: 28px 32px 80px;
 }
